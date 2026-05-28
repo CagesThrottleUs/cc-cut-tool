@@ -16,8 +16,7 @@ namespace cc_cut {
 namespace {
 
 auto parse_pos_int(std::string_view str) -> std::optional<int> {
-  // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-avoid-unchecked-container-access)
-  if (str.empty() || str[0] < '0' || str[0] > '9') {
+  if (str.empty() || str.front() < '0' || str.front() > '9') {
     return std::nullopt;
   }
   // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
