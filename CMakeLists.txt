@@ -13,6 +13,7 @@ find_package(Boost REQUIRED)
 # ----------------------------- Main Executable -----------------------------
 
 set(SRC_FILES
+  src/list_parser.cpp
 )
 
 add_executable(${PROJECT_NAME} src/main.cpp ${SRC_FILES})
@@ -40,6 +41,7 @@ add_executable(${TEST_PROJECT_NAME}
   tests/cut/list_test.cpp
   tests/cut/options_test.cpp
   tests/cut/file_source_test.cpp
+  tests/cut/list_parser_test.cpp
   ${SRC_FILES}
 )
 
