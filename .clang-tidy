@@ -11,4 +11,5 @@ Checks: >
   performance-*,
   portability-*,
   -portability-avoid-pragma-once,
+  -google-build-using-namespace,
   readability-*,

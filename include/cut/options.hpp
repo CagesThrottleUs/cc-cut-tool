@@ -3,6 +3,7 @@
 #include "cut/list.hpp"
 #include "cut/mode.hpp"
 
+// spec_id: SPEC-2  req_id: REQ-011
 namespace cc_cut {
 
 // spec_id: SPEC-1  req_id: REQ-003

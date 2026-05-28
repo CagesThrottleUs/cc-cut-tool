@@ -2,6 +2,7 @@
 #include <gtest/gtest.h>
 #include "cut/options.hpp"
 
+// spec_id: SPEC-2  validates_req: REQ-011
 using namespace cc_cut;
 
 // spec_id: SPEC-1  validates_req: REQ-003  tc: TC-REQ003-01

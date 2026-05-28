@@ -2,6 +2,7 @@
 #include <gtest/gtest.h>
 #include "cut/mode.hpp"
 
+// spec_id: SPEC-2  validates_req: REQ-011
 using namespace cc_cut;
 
 // TC-REQ001-01, TC-REQ001-02

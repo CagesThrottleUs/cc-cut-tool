@@ -2,6 +2,7 @@
 #include <optional>
 #include <string_view>
 
+// spec_id: SPEC-2  req_id: REQ-011
 namespace cc_cut {
 
 // spec_id: SPEC-1  req_id: REQ-004

@@ -4,6 +4,7 @@
 #include <type_traits>
 #include "cut/file_source.hpp"
 
+// spec_id: SPEC-2  validates_req: REQ-011
 using namespace cc_cut;
 
 // TC-REQ004-01: FileSource must be abstract.
