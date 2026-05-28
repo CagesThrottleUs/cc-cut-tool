@@ -60,22 +60,23 @@ No logic is implemented here — only the types, enums, and interface contracts 
 
 ### REQ-002: CutList Struct
 
-**Statement:** The project SHALL define `struct CutList` with two members: `std::set<int> indices` (0-based selected positions) and `int open_from` (value `-1` means closed/finite selection; value `≥0` means "select all positions from `open_from` to end of line inclusive").
+**Statement:** The project SHALL define `struct CutList` with two members: `std::set<int> indices` (0-based selected positions) and `std::optional<int> open_from` (`std::nullopt` means finite/closed selection; `some(n)` where `n ≥ 0` means "select all positions from index `n` to end of line inclusive").
 
 **Acceptance Criteria:**
-- [ ] `CutList` default-initialises with `indices` empty and `open_from == -1`
-- [ ] `open_from == -1` unambiguously represents a finite/closed selection
-- [ ] `open_from >= 0` unambiguously represents an open-ended range starting at that 0-based index
+- [ ] `CutList` default-initialises with `indices` empty and `open_from == std::nullopt`
+- [ ] `open_from == std::nullopt` unambiguously represents a finite/closed selection
+- [ ] `open_from == some(n)` where `n >= 0` unambiguously represents an open-ended range starting at 0-based index `n`
 - [ ] Defined in `include/cut/list.hpp`
 
 **Dependencies:**
 | Dependency | Assumed Behavior |
 |-----------|-----------------|
 | `<set>` | `std::set<int>` default-constructs empty |
+| `<optional>` | `std::optional<int>` default-constructs to `std::nullopt` |
 
 **Test Cases:**
-- TC-REQ002-01: Default-constructed `CutList` has `open_from == -1` and `indices.empty() == true`
-- TC-REQ002-02: Setting `open_from = 2` and querying it back returns `2`
+- TC-REQ002-01: Default-constructed `CutList` has `open_from == std::nullopt` and `indices.empty() == true`
+- TC-REQ002-02: Setting `open_from = 2` gives `open_from.has_value() == true` and `open_from.value() == 2`
 - TC-REQ002-03: Inserting `{0, 2, 4}` into `indices` and checking `indices.size() == 3` passes
 
 ---
