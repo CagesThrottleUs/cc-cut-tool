@@ -22,11 +22,13 @@ namespace cc_cut {
 
 namespace {
 
+// spec_id: SPEC-3  req_id: REQ-008
 auto format_error(std::string_view msg) -> std::string {
   return std::format("{}: {}\n{}", config::program_name, msg,
                      config::help_hint);
 }
 
+// spec_id: SPEC-3  req_id: REQ-008
 auto translate_list_error(std::string_view list_err, CutMode mode)
     -> std::string {
   if (list_err == "values may not include zero") {
@@ -38,6 +40,7 @@ auto translate_list_error(std::string_view list_err, CutMode mode)
   return format_error(list_err);
 }
 
+// spec_id: SPEC-3  req_id: REQ-010
 auto print_help() -> void {
   std::cout << std::format(
       "Usage: {0} -b list [-n] [file ...]\n"
@@ -78,7 +81,7 @@ auto extract_list_spec(std::string_view flag, int argc, char** argv, int& index)
     return flag.substr(2);
   }
   if (index >= argc) {
-    const char opt = flag.at(1);
+    const char opt = flag.substr(1).front();
     return std::unexpected(
         format_error(std::format("option requires an argument -- '{}'", opt)));
   }
@@ -112,7 +115,7 @@ auto parse_mode_properties(int argc, char** argv, int& index, CutOptions& opts)
         opts.delim = delim_str.front();
         ++index;
       } else {
-        if (!std::cmp_less(index + 1, args.size())) {
+        if (!std::cmp_less(static_cast<std::size_t>(index) + 1U, args.size())) {
           return std::unexpected(
               format_error("option requires an argument -- 'd'"));
         }

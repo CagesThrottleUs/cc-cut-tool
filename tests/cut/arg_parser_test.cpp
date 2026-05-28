@@ -475,3 +475,13 @@ TEST(HelpFlagTest, HelpWinsOverOtherArgs) {
   ASSERT_TRUE(result.has_value());
   EXPECT_TRUE(result->help_requested);
 }
+
+// spec_id: SPEC-3  validates_req: REQ-010  tc: TC-REQ010-03
+TEST(HelpFlagTest, HelpWritesUsageToStdout) {
+  testing::internal::CaptureStdout();
+  ArgvHolder holder{{"cut", "--help"}};
+  auto result = parse_args(holder.argc(), holder.argv());
+  const std::string output = testing::internal::GetCapturedStdout();
+  ASSERT_TRUE(result.has_value());
+  EXPECT_NE(output.find("Usage: cc-cut-tool"), std::string::npos);
+}

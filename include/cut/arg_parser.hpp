@@ -10,6 +10,9 @@
 
 namespace cc_cut {
 
+// Public API uses int argc, char** argv to match main()'s POSIX signature.
+// Implementations convert to std::span<char*> internally for safe iteration.
+
 // spec_id: SPEC-3  req_id: REQ-003,REQ-010
 /// Parse CLI arguments into a typed ParseResult.
 ///
