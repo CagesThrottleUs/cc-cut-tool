@@ -195,9 +195,9 @@ No logic is implemented here — only the types, enums, and interface contracts 
 
 | REQ-ID | Requirement | Test Cases | Status |
 |--------|-------------|-----------|--------|
-| REQ-001 | CutMode enum | TC-REQ001-01, TC-REQ001-02, TC-REQ001-03 | 🔴 Pending |
-| REQ-002 | CutList struct | TC-REQ002-01, TC-REQ002-02, TC-REQ002-03 | 🔴 Pending |
-| REQ-003 | CutOptions struct | TC-REQ003-01, TC-REQ003-02, TC-REQ003-03 | 🔴 Pending |
-| REQ-004 | FileSource interface | TC-REQ004-01, TC-REQ004-02, TC-REQ004-03, TC-REQ004-04 | 🔴 Pending |
-| REQ-005 | CMake include wiring | TC-REQ005-01, TC-REQ005-02 | 🔴 Pending |
-| REQ-006 | Clean compile | TC-REQ006-01, TC-REQ006-02 | 🔴 Pending |
+| REQ-001 | CutMode enum | TC-REQ001-01, TC-REQ001-02, TC-REQ001-03 | ✅ Pass |
+| REQ-002 | CutList struct | TC-REQ002-01, TC-REQ002-02, TC-REQ002-03 | ✅ Pass |
+| REQ-003 | CutOptions struct | TC-REQ003-01, TC-REQ003-02, TC-REQ003-03 | ✅ Pass |
+| REQ-004 | FileSource interface | TC-REQ004-01, TC-REQ004-02, TC-REQ004-03, TC-REQ004-04 | ✅ Pass |
+| REQ-005 | CMake include wiring | TC-REQ005-01, TC-REQ005-02 | ✅ Pass |
+| REQ-006 | Clean compile | TC-REQ006-01, TC-REQ006-02 | ✅ Pass |
