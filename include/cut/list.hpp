@@ -23,8 +23,9 @@ namespace cc_cut {
 ///   list.open_from = 4;     // also select position 4 to end-of-line
 /// @endcode
 struct CutList {
-    std::set<int>      indices;   ///< 0-based positions to select (finite portion).
-    std::optional<int> open_from; ///< If set, select from this 0-based index to EOL.
+  std::set<int> indices;  ///< 0-based positions to select (finite portion).
+  std::optional<int>
+      open_from;  ///< If set, select from this 0-based index to EOL.
 };
 
 }  // namespace cc_cut

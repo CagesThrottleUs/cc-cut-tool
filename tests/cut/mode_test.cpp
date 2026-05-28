@@ -1,6 +1,7 @@
 // spec_id: SPEC-1  validates_req: REQ-001
-#include <gtest/gtest.h>
 #include "cut/mode.hpp"
+
+#include <gtest/gtest.h>
 
 // spec_id: SPEC-2  validates_req: REQ-011
 using namespace cc_cut;
@@ -14,6 +15,6 @@ static_assert(sizeof(CutMode) == 1);
 
 // spec_id: SPEC-1  validates_req: REQ-001
 TEST(CutModeTest, DistinctValues) {
-    EXPECT_NE(CutMode::BYTE, CutMode::CHARACTER);
-    EXPECT_NE(CutMode::CHARACTER, CutMode::FIELD);
+  EXPECT_NE(CutMode::BYTE, CutMode::CHARACTER);
+  EXPECT_NE(CutMode::CHARACTER, CutMode::FIELD);
 }
