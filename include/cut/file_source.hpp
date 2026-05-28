@@ -2,6 +2,7 @@
 #include <optional>
 #include <string_view>
 
+// spec_id: SPEC-1  req_id: REQ-004
 /// Abstract source for line-oriented reading of a single input.
 ///
 /// Implementations provide stdin (always buffered in memory) or
@@ -13,7 +14,7 @@
 /// 2. Call getline() repeatedly until it returns nullopt.
 ///
 /// @note getline() advances an internal cursor — it is a query with
-///       a side effect, matching std::istream convention (SPEC-1 REQ-004).
+///       a side effect, matching std::istream convention.
 ///
 /// @code
 ///   std::unique_ptr<FileSource> src = make_file_source("data.tsv");
@@ -30,19 +31,27 @@ public:
     FileSource(FileSource&&)                         = delete;
     auto operator=(FileSource&&)      -> FileSource& = delete;
 
+    // spec_id: SPEC-1  req_id: REQ-004
     /// Reads the entire input into an internal buffer.
     ///
     /// Must be called exactly once before getline(). Calling more
     /// than once is undefined behaviour.
+    ///
+    /// @throws std::ios_base::failure If the underlying source cannot be
+    ///         opened or read (e.g. file missing, permission denied, I/O
+    ///         error). Implementations must not silently swallow errors.
     virtual void load() = 0;
 
+    // spec_id: SPEC-1  req_id: REQ-004
     /// Returns the next line without its trailing newline character.
     ///
     /// @return A string_view into the internal buffer for the next
     ///         line, or nullopt when all lines are consumed.
     /// @pre    load() has been called.
-    /// @note   The returned string_view is valid until load() is
-    ///         called again or the FileSource is destroyed.
+    /// @warning The returned string_view aliases the internal buffer.
+    ///          It is invalidated when load() is called again or when
+    ///          the FileSource is destroyed. Storing it past either
+    ///          event is undefined behaviour.
     virtual auto getline() -> std::optional<std::string_view> = 0;
 
     virtual ~FileSource() = default;

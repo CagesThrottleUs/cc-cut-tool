@@ -1,6 +1,7 @@
 #pragma once
 #include <cstdint>
 
+// spec_id: SPEC-1  req_id: REQ-001
 /// Operating mode for the cut tool, selected by the first CLI flag.
 ///
 /// Exactly one mode is active per invocation. Modes are mutually exclusive.

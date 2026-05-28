@@ -2,6 +2,7 @@
 #include <optional>
 #include <set>
 
+// spec_id: SPEC-1  req_id: REQ-002
 /// Parsed selection list from a -b, -c, or -f argument.
 ///
 /// A selection is finite (closed) or open-ended:

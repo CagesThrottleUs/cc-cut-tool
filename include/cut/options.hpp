@@ -3,6 +3,7 @@
 #include "cut/list.hpp"
 #include "cut/mode.hpp"
 
+// spec_id: SPEC-1  req_id: REQ-003
 /// Aggregated, validated options for a single cut invocation.
 ///
 /// Populated by the argument parser (SP-03) from argv. A
