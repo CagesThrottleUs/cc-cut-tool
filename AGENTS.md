@@ -18,6 +18,9 @@ C++ implementation of the POSIX `cut` utility. Built with CMake + Ninja + Clang 
 
 See [README.md](README.md) for build and test commands.
 
+**Note:** CMake presets set `CMAKE_CXX_COMPILER=/opt/homebrew/opt/llvm/bin/clang++`
+to ensure `clang-tidy -p out/build/clang-debug` resolves C++23 headers.
+
 ### CTest Labels
 
 | Label | What runs |
@@ -60,7 +63,7 @@ sample/               Sample data files (TSV, CSV)
 | SP | Status |
 |----|--------|
 | SP-01 Foundation | ✅ Complete |
-| SP-02 List Parser | Pending |
+| SP-02 List Parser | ✅ Complete |
 | SP-03 Arg Parser | Pending |
 | SP-04 File Interface | Pending |
 | SP-05 Field Mode | Pending |
