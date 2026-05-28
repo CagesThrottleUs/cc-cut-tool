@@ -29,16 +29,18 @@ codebase.
 ## Scope
 
 **In scope:**
-- `ParseResult` struct (`CutOptions` + `std::vector<std::string>` files)
+- `ParseResult` struct (`CutOptions` + `std::vector<std::string>` files + `bool help_requested`)
 - `include/cut/config.hpp.in` template + CMake `configure_file` wiring
 - `include/cut/arg_parser.hpp` — declare `parse_args` + five helpers
 - `src/arg_parser.cpp` — implement all six functions
 - `namespace cc_cut` for all new symbols
 - Coreutils-compatible error strings (prefix + hint on one error value)
 - File-path deduplication (first-occurrence, includes `-` for stdin)
+- `--help` flag: print help text to stdout, set `ParseResult::help_requested = true`
 
 **Out of scope:**
-- `--help` / `--version` handling — hint string only (no output)
+- `--version` flag — not in SYNOPSIS
+- `-w` whitespace-delimiter flag — not required for initial implementation
 - `--complement` flag — not in SYNOPSIS
 - `--output-delimiter` — not in SYNOPSIS
 - `-z` (NUL-terminated lines) — not in SYNOPSIS
@@ -51,14 +53,15 @@ codebase.
 
 ### REQ-001: ParseResult Struct
 
-**Statement:** The project SHALL define `struct cc_cut::ParseResult` with two
-members: `CutOptions opts` and `std::vector<std::string> files` in
-`include/cut/parse_result.hpp`.
+**Statement:** The project SHALL define `struct cc_cut::ParseResult` with three
+members: `CutOptions opts`, `std::vector<std::string> files`, and
+`bool help_requested = false` in `include/cut/parse_result.hpp`.
 
 **Acceptance Criteria:**
-- [ ] Default-constructed `ParseResult` has `opts == CutOptions{}` and
-      `files.empty() == true`
+- [ ] Default-constructed `ParseResult` has `opts == CutOptions{}`,
+      `files.empty() == true`, and `help_requested == false`
 - [ ] `files` holds plain file-path strings (not `FileSource` objects)
+- [ ] `help_requested == true` signals caller to exit 0 after printing help
 - [ ] Defined inside `namespace cc_cut {}`
 
 **Dependencies:**
@@ -67,8 +70,9 @@ members: `CutOptions opts` and `std::vector<std::string> files` in
 | `CutOptions` (SPEC-1 REQ-003) | Default-constructs with `mode=FIELD`, `delim=nullopt`, `suppress=false`, `no_split=false` |
 
 **Test Cases:**
-- TC-REQ001-01: Default `ParseResult` has `opts.mode == CutMode::FIELD` and `files.empty() == true`
+- TC-REQ001-01: Default `ParseResult` has `opts.mode == CutMode::FIELD`, `files.empty() == true`, and `help_requested == false`
 - TC-REQ001-02: Assigning `files = {"a.txt", "b.txt"}` gives `files.size() == 2`
+- TC-REQ001-03: Setting `help_requested = true` and reading it back returns `true`
 
 ---
 
@@ -324,6 +328,48 @@ or `-f`, `parse_args` SHALL return error
 
 ---
 
+### REQ-010: --help Flag
+
+**Statement:** When `--help` appears as any argument in `argv[1..argc-1]`,
+`parse_args` SHALL print the help text below to stdout and return a
+`ParseResult` with `help_requested = true` (all other fields at their
+default values).
+
+Help text (exact, printed to stdout):
+```
+Usage: cc-cut-tool -b list [-n] [file ...]
+       cc-cut-tool -c list [file ...]
+       cc-cut-tool -f list [-d delim] [-s] [file ...]
+
+  -b list  Cut by byte positions
+  -c list  Cut by character positions (UTF-8)
+  -f list  Cut by fields
+  -d delim Field delimiter (default: tab)
+  -n       Do not split multi-byte characters (byte mode)
+  -s       Suppress lines with no delimiter (field mode)
+  --help   Show this help
+```
+
+**Acceptance Criteria:**
+- [ ] `parse_args` with `--help` anywhere in argv returns `ParseResult` with
+      `help_requested == true`
+- [ ] `parse_args` with `--help` writes the exact help text above to stdout
+- [ ] `parse_args` with `--help` does NOT return an error (returns success)
+- [ ] `--help` before a valid mode flag is still recognised (not treated as
+      a file argument)
+
+**Dependencies:**
+| Dependency | Assumed Behavior |
+|-----------|-----------------|
+| `cc_cut::config::program_name` | `"cc-cut-tool"` used in Usage line |
+
+**Test Cases:**
+- TC-REQ010-01: `parse_args(2, ["cut", "--help"])` → `result.has_value() == true` and `result->help_requested == true`
+- TC-REQ010-02: `parse_args(3, ["cut", "--help", "-f1"])` → `result->help_requested == true` (--help wins)
+- TC-REQ010-03: `parse_args(2, ["cut", "--help"])` → stdout contains `"Usage: cc-cut-tool"`
+
+---
+
 ## Assumptions
 
 | ID | Assumption | Impact if Wrong | Verified By |
@@ -339,7 +385,7 @@ or `-f`, `parse_args` SHALL return error
 
 | REQ-ID | Requirement | Test Cases | Status |
 |--------|-------------|-----------|--------|
-| REQ-001 | ParseResult struct | TC-REQ001-01, TC-REQ001-02 | 🔴 Pending |
+| REQ-001 | ParseResult struct | TC-REQ001-01, TC-REQ001-02, TC-REQ001-03 | 🔴 Pending |
 | REQ-002 | config.hpp generation | TC-REQ002-01, TC-REQ002-02 | 🔴 Pending |
 | REQ-003 | parse_args signature | TC-REQ003-01, TC-REQ003-02, TC-REQ003-03 | 🔴 Pending |
 | REQ-004 | detect_mode | TC-REQ004-01..06 | 🔴 Pending |
@@ -348,3 +394,4 @@ or `-f`, `parse_args` SHALL return error
 | REQ-007 | collect_files | TC-REQ007-01..04 | 🔴 Pending |
 | REQ-008 | Error message format | TC-REQ008-01..05 | 🔴 Pending |
 | REQ-009 | No mode specified | TC-REQ009-01..03 | 🔴 Pending |
+| REQ-010 | --help flag | TC-REQ010-01, TC-REQ010-02, TC-REQ010-03 | 🔴 Pending |
