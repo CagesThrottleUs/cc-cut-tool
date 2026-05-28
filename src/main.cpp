@@ -6,7 +6,6 @@
 #include "cut/mode.hpp"
 
 // spec_id: SPEC-5  req_id: REQ-007
-// NOLINTNEXTLINE(bugprone-exception-escape)
 auto main(int argc, char** argv) -> int {
   auto result = cc_cut::parse_args(argc, argv);
   if (!result) {

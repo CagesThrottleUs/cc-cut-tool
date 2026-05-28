@@ -12,3 +12,4 @@ Checks: >
   portability-*,
   -portability-avoid-pragma-once,
   readability-*,
+  -bugprone-exception-escape,
