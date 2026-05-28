@@ -4,7 +4,7 @@
 #include <gtest/gtest.h>
 
 // spec_id: SPEC-2  validates_req: REQ-011
-using namespace cc_cut;
+using cc_cut::CutMode;
 
 // TC-REQ001-01, TC-REQ001-02
 static_assert(CutMode::BYTE != CutMode::CHARACTER);

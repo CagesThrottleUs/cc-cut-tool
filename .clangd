@@ -1,4 +1,6 @@
 CompileFlags:
+  CompilationDatabase: out/build/clang-debug
+  Compiler: /opt/homebrew/opt/llvm/bin/clang++
   Add:
     - -std=c++23
     # Warnings: enable all, treat as errors (including deprecated)
@@ -10,6 +12,8 @@ CompileFlags:
     # C++23 project: ignore C++98 compatibility (included in -Weverything)
     - -Wno-c++98-compat
     - -Wno-c++98-compat-pedantic
+    # from_chars requires raw pointer arithmetic; the stdlib API cannot be changed
+    - -Wno-unsafe-buffer-usage
     # Use Homebrew LLVM libc++
     - -nostdinc++
     - -isystem
@@ -22,8 +26,8 @@ CompileFlags:
     # - -isystem
     # - /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include
 
-    # Project headers (relative to project root)
-    - -I/Users/laksh/Documents/PersonalCode/coding-challenges/cc-cut-tool/include
+    # Project headers
+    - -I/Users/laksh/Documents/PersonalCode/cc-cut-tool/include
 
     # Boost headers
     - -isystem

@@ -7,11 +7,13 @@
 #include <type_traits>
 
 // spec_id: SPEC-2  validates_req: REQ-011
-using namespace cc_cut;
+using cc_cut::FileSource;
 
 // TC-REQ004-01: FileSource must be abstract.
 static_assert(std::is_abstract_v<FileSource>,
               "TC-REQ004-01: FileSource must be abstract");
+
+namespace {
 
 class StubFileSource : public FileSource {
  public:
@@ -20,6 +22,8 @@ class StubFileSource : public FileSource {
     return std::nullopt;
   }
 };
+
+}  // namespace
 
 // spec_id: SPEC-1  validates_req: REQ-004  tc: TC-REQ004-02
 TEST(FileSourceTest, ConcreteSubclassInstantiable) {
@@ -36,6 +40,6 @@ TEST(FileSourceTest, GetlineReturnsNullopt) {
 
 // spec_id: SPEC-1  validates_req: REQ-004  tc: TC-REQ004-04
 TEST(FileSourceTest, VirtualDestructorViaBasePtr) {
-  std::unique_ptr<FileSource> p = std::make_unique<StubFileSource>();
-  EXPECT_EQ(p->getline(), std::nullopt);
+  std::unique_ptr<FileSource> src = std::make_unique<StubFileSource>();
+  EXPECT_EQ(src->getline(), std::nullopt);
 }

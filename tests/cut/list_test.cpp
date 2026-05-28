@@ -4,7 +4,7 @@
 #include <gtest/gtest.h>
 
 // spec_id: SPEC-2  validates_req: REQ-011
-using namespace cc_cut;
+using cc_cut::CutList;
 
 // spec_id: SPEC-1  validates_req: REQ-002  tc: TC-REQ002-01
 TEST(CutListTest, DefaultInit) {

@@ -4,7 +4,8 @@
 #include <gtest/gtest.h>
 
 // spec_id: SPEC-2  validates_req: REQ-011
-using namespace cc_cut;
+using cc_cut::CutMode;
+using cc_cut::CutOptions;
 
 // spec_id: SPEC-1  validates_req: REQ-003  tc: TC-REQ003-01
 TEST(CutOptionsTest, DefaultInit) {

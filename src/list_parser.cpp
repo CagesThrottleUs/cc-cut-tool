@@ -1,8 +1,12 @@
 #include "cut/list_parser.hpp"
 
 #include <charconv>
+#include <expected>
 #include <format>
+#include <optional>
 #include <string>
+#include <string_view>
+#include <system_error>
 #include <vector>
 
 #include "cut/list.hpp"
@@ -15,10 +19,12 @@ auto parse_pos_int(std::string_view str) -> std::optional<int> {
   if (str.empty() || str[0] < '0' || str[0] > '9') {
     return std::nullopt;
   }
-  // NOLINTNEXTLINE(misc-const-correctness) -- from_chars writes through the ref
+  // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+  const char* const str_end = str.data() + str.size();
   int parsed = 0;
-  auto [ptr, ec] = std::from_chars(str.data(), str.data() + str.size(), parsed);
-  if (ec != std::errc{} || ptr != str.data() + str.size()) {
+  // NOLINTNEXTLINE(bugprone-suspicious-stringview-data-usage)
+  const auto [ptr, ec] = std::from_chars(str.data(), str_end, parsed);
+  if (ec != std::errc{} || ptr != str_end) {
     return std::nullopt;
   }
   return parsed;
@@ -27,11 +33,11 @@ auto parse_pos_int(std::string_view str) -> std::optional<int> {
 auto tokenize(std::string_view list_arg) -> std::vector<std::string> {
   std::vector<std::string> tokens;
 
-  if (list_arg.find(',') != std::string_view::npos) {
+  if (list_arg.contains(',')) {
     std::string_view rem = list_arg;
     while (true) {
       auto comma = rem.find(',');
-      std::string_view part =
+      const std::string_view part =
           (comma == std::string_view::npos) ? rem : rem.substr(0, comma);
 
       auto first = part.find_first_not_of(" \t");
@@ -110,33 +116,33 @@ auto apply_token(std::string_view token, CutList& cutlist)
   auto left = token.substr(0, dash);
   auto right = token.substr(dash + 1);
 
-  auto lnum = parse_pos_int(left);
-  if (!lnum) {
+  auto left_num = parse_pos_int(left);
+  if (!left_num) {
     return std::unexpected(std::format("invalid field value: {}", token));
   }
-  if (*lnum == 0) {
+  if (*left_num == 0) {
     return std::unexpected("values may not include zero");
   }
 
   if (right.empty()) {
-    int open = *lnum - 1;
+    int open = *left_num - 1;
     if (!cutlist.open_from.has_value() || open < *cutlist.open_from) {
       cutlist.open_from = open;
     }
     return {};
   }
 
-  auto rnum = parse_pos_int(right);
-  if (!rnum) {
+  auto right_num = parse_pos_int(right);
+  if (!right_num) {
     return std::unexpected(std::format("invalid field value: {}", token));
   }
-  if (*rnum == 0) {
+  if (*right_num == 0) {
     return std::unexpected("values may not include zero");
   }
-  if (*lnum > *rnum) {
+  if (*left_num > *right_num) {
     return std::unexpected("invalid decreasing range");
   }
-  for (int idx = *lnum - 1; idx < *rnum; ++idx) {
+  for (int idx = *left_num - 1; idx < *right_num; ++idx) {
     cutlist.indices.insert(idx);
   }
   return {};
@@ -153,8 +159,6 @@ auto parse_list(std::string_view list_arg)
     return std::unexpected("missing list specification");
   }
 
-  // NOLINTNEXTLINE(misc-const-correctness) -- apply_token mutates result via
-  // non-const ref
   CutList result;
   for (const auto& token : tokens) {
     auto outcome = apply_token(token, result);

@@ -4,7 +4,6 @@
 #include <string_view>
 
 #include "cut/list.hpp"
-#include "cut/mode.hpp"
 
 namespace cc_cut {
 
