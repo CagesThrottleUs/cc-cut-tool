@@ -66,8 +66,8 @@ The field/byte/character processors (SP-05 through SP-07) decide how to handle
 | `include/cut/file_source.hpp` (SPEC-1) | Header already exists; constant is added to it |
 
 **Test Cases:**
-- TC-REQ001-01: `static_assert(cc_cut::mmap_threshold == 104857600ULL)` compiles and passes
-- TC-REQ001-02: `static_assert(cc_cut::mmap_threshold == 100ULL * 1024ULL * 1024ULL)` passes
+- TC-REQ001-01: `static_assert(cc_cut::mmap_threshold > 0)` compiles — confirms the constant exists and is positive; value is not asserted so it can be changed without breaking tests
+- TC-REQ001-02: `static_assert(std::is_same_v<decltype(cc_cut::mmap_threshold), const std::size_t>)` compiles — confirms the type is `std::size_t`
 
 ---
 
@@ -76,7 +76,7 @@ The field/byte/character processors (SP-05 through SP-07) decide how to handle
 **Statement:** `FileSource` SHALL declare and define
 `static auto next_line(std::string_view buffer, std::size_t& cursor) -> std::optional<std::string_view>`
 as a `protected` member. The method SHALL:
-1. Return `std::nullopt` when `cursor == buffer.size()`.
+1. Return `std::nullopt` when `cursor >= buffer.size()`.
 2. Search for `\n` in `buffer` starting at `cursor`.
 3. If `\n` found at position `pos`: return `buffer.substr(cursor, pos - cursor)`,
    set `cursor = pos + 1`, return the view.
