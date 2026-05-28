@@ -2,6 +2,8 @@
 #include <gtest/gtest.h>
 #include "cut/options.hpp"
 
+using namespace cc_cut;
+
 // spec_id: SPEC-1  validates_req: REQ-003  tc: TC-REQ003-01
 TEST(CutOptionsTest, DefaultInit) {
     CutOptions opts;

@@ -2,6 +2,8 @@
 #include <gtest/gtest.h>
 #include "cut/mode.hpp"
 
+using namespace cc_cut;
+
 // TC-REQ001-01, TC-REQ001-02
 static_assert(CutMode::BYTE != CutMode::CHARACTER);
 static_assert(CutMode::CHARACTER != CutMode::FIELD);

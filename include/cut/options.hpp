@@ -3,6 +3,8 @@
 #include "cut/list.hpp"
 #include "cut/mode.hpp"
 
+namespace cc_cut {
+
 // spec_id: SPEC-1  req_id: REQ-003
 /// Aggregated, validated options for a single cut invocation.
 ///
@@ -11,8 +13,8 @@
 /// stdin with whitespace splitting and no flags.
 ///
 /// @code
-///   CutOptions opts;
-///   opts.mode  = CutMode::FIELD;
+///   cc_cut::CutOptions opts;
+///   opts.mode  = cc_cut::CutMode::FIELD;
 ///   opts.delim = ',';              // CSV input
 ///   opts.list.indices = {0, 2};   // first and third fields
 /// @endcode
@@ -26,3 +28,5 @@ struct CutOptions {
     bool suppress = false; ///< -s: skip lines that contain no delimiter.
     bool no_split = false; ///< -n: do not split multibyte chars (BYTE mode only).
 };
+
+}  // namespace cc_cut

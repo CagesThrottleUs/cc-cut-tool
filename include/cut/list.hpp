@@ -2,6 +2,8 @@
 #include <optional>
 #include <set>
 
+namespace cc_cut {
+
 // spec_id: SPEC-1  req_id: REQ-002
 /// Parsed selection list from a -b, -c, or -f argument.
 ///
@@ -15,7 +17,7 @@
 /// @invariant If `open_from` has a value, it is >= 0.
 ///
 /// @code
-///   CutList list;
+///   cc_cut::CutList list;
 ///   list.indices = {0, 2};  // select positions 0 and 2
 ///   list.open_from = 4;     // also select position 4 to end-of-line
 /// @endcode
@@ -23,3 +25,5 @@ struct CutList {
     std::set<int>      indices;   ///< 0-based positions to select (finite portion).
     std::optional<int> open_from; ///< If set, select from this 0-based index to EOL.
 };
+
+}  // namespace cc_cut

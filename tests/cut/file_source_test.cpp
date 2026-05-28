@@ -4,7 +4,9 @@
 #include <type_traits>
 #include "cut/file_source.hpp"
 
-// TC-REQ004-01: FileSource must be abstract (not directly instantiable).
+using namespace cc_cut;
+
+// TC-REQ004-01: FileSource must be abstract.
 static_assert(std::is_abstract_v<FileSource>,
               "TC-REQ004-01: FileSource must be abstract");
 

@@ -2,6 +2,8 @@
 #include <gtest/gtest.h>
 #include "cut/list.hpp"
 
+using namespace cc_cut;
+
 // spec_id: SPEC-1  validates_req: REQ-002  tc: TC-REQ002-01
 TEST(CutListTest, DefaultInit) {
     CutList list;

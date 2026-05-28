@@ -2,6 +2,8 @@
 #include <optional>
 #include <string_view>
 
+namespace cc_cut {
+
 // spec_id: SPEC-1  req_id: REQ-004
 /// Abstract source for line-oriented reading of a single input.
 ///
@@ -17,7 +19,7 @@
 ///       a side effect, matching std::istream convention.
 ///
 /// @code
-///   std::unique_ptr<FileSource> src = make_file_source("data.tsv");
+///   std::unique_ptr<cc_cut::FileSource> src = make_file_source("data.tsv");
 ///   src->load();
 ///   while (auto line = src->getline()) {
 ///       process(*line);
@@ -56,3 +58,5 @@ public:
 
     virtual ~FileSource() = default;
 };
+
+}  // namespace cc_cut
