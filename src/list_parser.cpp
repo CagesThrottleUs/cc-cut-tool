@@ -16,8 +16,7 @@ namespace cc_cut {
 namespace {
 
 auto parse_pos_int(std::string_view str) -> std::optional<int> {
-  // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-avoid-unchecked-container-access)
-  if (str.empty() || str[0] < '0' || str[0] > '9') {
+  if (str.empty() || str.front() < '0' || str.front() > '9') {
     return std::nullopt;
   }
   // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
@@ -151,7 +150,6 @@ auto apply_token(std::string_view token, CutList& cutlist)
 
 }  // anonymous namespace
 
-// NOLINTNEXTLINE(misc-use-internal-linkage) -- declared in list_parser.hpp;
 // external linkage required
 auto parse_list(std::string_view list_arg)
     -> std::expected<CutList, std::string> {

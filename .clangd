@@ -3,6 +3,7 @@ CompileFlags:
   Compiler: /opt/homebrew/opt/llvm/bin/clang++
   Add:
     - -std=c++23
+    - -ferror-limit=0
     # Warnings: enable all, treat as errors (including deprecated)
     - -Wall
     - -Werror

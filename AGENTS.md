@@ -21,6 +21,20 @@ See [README.md](README.md) for build and test commands.
 **Note:** CMake presets set `CMAKE_CXX_COMPILER=/opt/homebrew/opt/llvm/bin/clang++`
 to ensure `clang-tidy -p out/build/clang-debug` resolves C++23 headers.
 
+## Clangd / Clang-tidy Gotchas
+
+- `Compiler:` override in `.clangd` required — compile_commands.json records ccache;
+  clangd cannot introspect it for C++23 headers (`<expected>`, `<format>`).
+- `-Werror` absent from `.clangd` intentionally — `-Weverything` fires on every `TEST()`
+  macro; 85+ tests exceed the 20-error limit causing `fatal_too_many_errors`.
+- `misc-use-internal-linkage` does NOT fire on functions declared in headers — do not
+  add NOLINTNEXTLINE for this check on externally-linked functions; verify with
+  `clang-tidy -p out/build/clang-debug <file>` before suppressing.
+- `from_chars` requires raw `const char*` (no C++23 safe alternative) — 2 NOLINTNEXTLINE
+  in `src/list_parser.cpp` are legitimate and unavoidable.
+- Use `arg.starts_with("-d")` instead of `arg[1]=='d'` to avoid bounds-check warnings.
+- Use `span.subspan(i).front()` instead of `argv[i]` to eliminate pointer arithmetic.
+
 ### CTest Labels
 
 | Label | What runs |

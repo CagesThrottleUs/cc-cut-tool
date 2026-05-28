@@ -6,7 +6,6 @@
 
 #include <set>
 
-using cc_cut::CutList;
 using cc_cut::parse_list;
 
 // ---- REQ-011: namespace cc_cut ----
@@ -30,12 +29,12 @@ TEST(ParseListTest, ReturnsErrorForEmptyInput) {
 
 // spec_id: SPEC-2  validates_req: REQ-001  tc: TC-REQ001-03
 TEST(ParseListTest, PureFunctionIdenticalResults) {
-  auto r1 = parse_list("1");
-  auto r2 = parse_list("1");
-  ASSERT_TRUE(r1.has_value());
-  ASSERT_TRUE(r2.has_value());
-  EXPECT_EQ(r1->indices, r2->indices);
-  EXPECT_EQ(r1->open_from, r2->open_from);
+  auto res1 = parse_list("1");
+  auto res2 = parse_list("1");
+  ASSERT_TRUE(res1.has_value());
+  ASSERT_TRUE(res2.has_value());
+  EXPECT_EQ(res1->indices, res2->indices);
+  EXPECT_EQ(res1->open_from, res2->open_from);
 }
 
 // ---- REQ-002: comma tokenization ----

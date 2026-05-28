@@ -1,0 +1,13 @@
+// include/cut/config.hpp.in
+#pragma once
+#include <string_view>
+
+// spec_id: SPEC-3  req_id: REQ-002
+namespace cc_cut::config {
+
+inline constexpr std::string_view program_name = "@PROJECT_NAME@";
+inline constexpr std::string_view version = "@PROJECT_VERSION@";
+inline constexpr std::string_view help_hint =
+    "Try '@PROJECT_NAME@ --help' for more information.";
+
+}  // namespace cc_cut::config
