@@ -70,7 +70,7 @@ sample/               Sample data files (TSV, CSV)
 - `CutList::open_from` is `std::optional<int>` — `nullopt` = finite, `some(n)` = select from n to EOL
 - `CutOptions::delim` is `std::optional<char>` — `nullopt` = whitespace-split, `some(c)` = exact char
 - `FileSource` deletes copy/move — consumed only via `unique_ptr<FileSource>`
-- Boost.Iostreams declared in CMake but not linked until SP-04
+- Boost.Iostreams linked in CMake (SP-04); used by MmapFileSource
 
 ## Sub-Project Status
 
@@ -79,7 +79,7 @@ sample/               Sample data files (TSV, CSV)
 | SP-01 Foundation | ✅ Complete |
 | SP-02 List Parser | ✅ Complete |
 | SP-03 Arg Parser | Pending |
-| SP-04 File Interface | Pending |
+| SP-04 File Interface | ✅ Complete |
 | SP-05 Field Mode | Pending |
 | SP-06 Byte Mode | Pending |
 | SP-07 Char Mode | Pending |
