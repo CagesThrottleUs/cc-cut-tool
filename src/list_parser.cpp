@@ -150,7 +150,6 @@ auto apply_token(std::string_view token, CutList& cutlist)
 
 }  // anonymous namespace
 
-// NOLINTNEXTLINE(misc-use-internal-linkage) -- declared in list_parser.hpp;
 // external linkage required
 auto parse_list(std::string_view list_arg)
     -> std::expected<CutList, std::string> {

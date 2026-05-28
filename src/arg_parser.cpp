@@ -1,6 +1,7 @@
 // src/arg_parser.cpp
 #include "cut/arg_parser.hpp"
 
+#include <cstddef>
 #include <expected>
 #include <format>
 #include <iostream>
@@ -54,27 +55,23 @@ auto print_help() -> void {
 
 }  // anonymous namespace
 
-// NOLINTNEXTLINE(misc-use-internal-linkage)
 auto detect_mode(std::string_view flag) -> std::expected<CutMode, std::string> {
+  if (flag.starts_with("-b")) {
+    return CutMode::BYTE;
+  }
+  if (flag.starts_with("-c")) {
+    return CutMode::CHARACTER;
+  }
+  if (flag.starts_with("-f")) {
+    return CutMode::FIELD;
+  }
   if (flag.size() >= 2 && flag.front() == '-') {
-    const char opt = flag
-        [1];  // NOLINT(cppcoreguidelines-pro-bounds-avoid-unchecked-container-access)
-    switch (opt) {
-      case 'b':
-        return CutMode::BYTE;
-      case 'c':
-        return CutMode::CHARACTER;
-      case 'f':
-        return CutMode::FIELD;
-      default:
-        return std::unexpected(
-            format_error(std::format("invalid option -- '{}'", opt)));
-    }
+    return std::unexpected(format_error(
+        std::format("invalid option -- '{}'", flag.substr(1).front())));
   }
   return std::unexpected(format_error("invalid option"));
 }
 
-// NOLINTNEXTLINE(misc-use-internal-linkage)
 auto extract_list_spec(std::string_view flag, int argc, char** argv, int& index)
     -> std::expected<std::string_view, std::string> {
   if (flag.size() > 2) {
@@ -86,15 +83,18 @@ auto extract_list_spec(std::string_view flag, int argc, char** argv, int& index)
         format_error(std::format("option requires an argument -- '{}'", opt)));
   }
   const auto args = std::span<char*>{argv, static_cast<std::size_t>(argc)};
-  return std::string_view{args[static_cast<std::size_t>(index++)]};
+  const std::string_view result{
+      args.subspan(static_cast<std::size_t>(index)).front()};
+  ++index;
+  return result;
 }
 
-// NOLINTNEXTLINE(misc-use-internal-linkage)
 auto parse_mode_properties(int argc, char** argv, int& index, CutOptions& opts)
     -> std::expected<void, std::string> {
   const auto args = std::span<char*>{argv, static_cast<std::size_t>(argc)};
-  while (index < static_cast<int>(args.size())) {
-    const std::string_view arg{args[static_cast<std::size_t>(index)]};
+  while (std::cmp_less(index, args.size())) {
+    const std::string_view arg{
+        args.subspan(static_cast<std::size_t>(index)).front()};
 
     if (opts.mode == CutMode::BYTE && arg == "-n") {
       opts.no_split = true;
@@ -102,10 +102,7 @@ auto parse_mode_properties(int argc, char** argv, int& index, CutOptions& opts)
     } else if (opts.mode == CutMode::FIELD && arg == "-s") {
       opts.suppress = true;
       ++index;
-    } else if (
-        opts.mode == CutMode::FIELD && arg.size() >= 2 && arg.front() == '-' &&
-        arg[1] ==
-            'd') {  // NOLINT(cppcoreguidelines-pro-bounds-avoid-unchecked-container-access)
+    } else if (opts.mode == CutMode::FIELD && arg.starts_with("-d")) {
       if (arg.size() > 2) {
         auto delim_str = arg.substr(2);
         if (delim_str.size() != 1) {
@@ -115,12 +112,12 @@ auto parse_mode_properties(int argc, char** argv, int& index, CutOptions& opts)
         opts.delim = delim_str.front();
         ++index;
       } else {
-        if (index + 1 >= static_cast<int>(args.size())) {
+        if (!std::cmp_less(index + 1, args.size())) {
           return std::unexpected(
               format_error("option requires an argument -- 'd'"));
         }
         const std::string_view delim_str{
-            args[static_cast<std::size_t>(index) + 1U]};
+            args.subspan(static_cast<std::size_t>(index) + 1U).front()};
         if (delim_str.size() != 1) {
           return std::unexpected(
               format_error("the delimiter must be a single character"));
@@ -135,7 +132,6 @@ auto parse_mode_properties(int argc, char** argv, int& index, CutOptions& opts)
   return {};
 }
 
-// NOLINTNEXTLINE(misc-use-internal-linkage)
 auto collect_files(int argc, char** argv, int index)
     -> std::vector<std::string> {
   std::vector<std::string> files;
@@ -150,7 +146,6 @@ auto collect_files(int argc, char** argv, int index)
   return files;
 }
 
-// NOLINTNEXTLINE(misc-use-internal-linkage)
 auto parse_args(int argc, char** argv)
     -> std::expected<ParseResult, std::string> {
   const auto args = std::span<char*>{argv, static_cast<std::size_t>(argc)};

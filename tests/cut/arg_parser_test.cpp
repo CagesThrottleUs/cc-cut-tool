@@ -28,7 +28,7 @@ namespace {
 struct ArgvHolder {
  private:
   std::vector<std::string> storage;
-  std::vector<char*>       argv_vec;
+  std::vector<char*> argv_vec;
 
  public:
   explicit ArgvHolder(std::vector<std::string> args)
