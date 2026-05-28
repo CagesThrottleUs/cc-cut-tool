@@ -1,7 +1,6 @@
-// spec_id: SPEC-3  validates_req: REQ-001,REQ-002,REQ-003,REQ-004,REQ-005,REQ-006,REQ-007,REQ-008,REQ-009,REQ-010
+// spec_id: SPEC-3  validates_req:
+// REQ-001,REQ-002,REQ-003,REQ-004,REQ-005,REQ-006,REQ-007,REQ-008,REQ-009,REQ-010
 #include "cut/arg_parser.hpp"
-#include "cut/config.hpp"
-#include "cut/parse_result.hpp"
 
 #include <gtest/gtest.h>
 
@@ -9,30 +8,44 @@
 #include <string>
 #include <vector>
 
+#include "cut/config.hpp"
+#include "cut/parse_result.hpp"
+
+using cc_cut::collect_files;
 using cc_cut::CutMode;
 using cc_cut::CutOptions;
-using cc_cut::ParseResult;
-using cc_cut::collect_files;
 using cc_cut::detect_mode;
 using cc_cut::extract_list_spec;
 using cc_cut::parse_args;
 using cc_cut::parse_mode_properties;
+using cc_cut::ParseResult;
 
 // ---------------------------------------------------------------------------
 // Helper: build a char** argv from vector<string> (strings stay alive)
 // ---------------------------------------------------------------------------
+namespace {
+
 struct ArgvHolder {
+ private:
   std::vector<std::string> storage;
   std::vector<char*>       argv_vec;
 
-  explicit ArgvHolder(std::vector<std::string> args) : storage(std::move(args)) {
-    for (auto& s : storage) argv_vec.push_back(s.data());
+ public:
+  explicit ArgvHolder(std::vector<std::string> args)
+      : storage(std::move(args)) {
+    for (auto& str : storage) {
+      argv_vec.push_back(str.data());
+    }
     argv_vec.push_back(nullptr);
   }
 
-  int    argc() const { return static_cast<int>(storage.size()); }
-  char** argv() { return argv_vec.data(); }
+  [[nodiscard]] auto argc() const -> int {
+    return static_cast<int>(storage.size());
+  }
+  auto argv() -> char** { return argv_vec.data(); }
 };
+
+}  // namespace
 
 // ---------------------------------------------------------------------------
 // REQ-001: ParseResult struct
@@ -151,7 +164,8 @@ TEST(ExtractListSpecTest, MissingListArgForF) {
   int index = 2;
   auto result = extract_list_spec("-f", holder.argc(), holder.argv(), index);
   ASSERT_FALSE(result.has_value());
-  EXPECT_NE(result.error().find("option requires an argument"), std::string::npos);
+  EXPECT_NE(result.error().find("option requires an argument"),
+            std::string::npos);
   EXPECT_NE(result.error().find("'f'"), std::string::npos);
 }
 
@@ -161,7 +175,8 @@ TEST(ExtractListSpecTest, MissingListArgForB) {
   int index = 2;
   auto result = extract_list_spec("-b", holder.argc(), holder.argv(), index);
   ASSERT_FALSE(result.has_value());
-  EXPECT_NE(result.error().find("option requires an argument"), std::string::npos);
+  EXPECT_NE(result.error().find("option requires an argument"),
+            std::string::npos);
   EXPECT_NE(result.error().find("'b'"), std::string::npos);
 }
 
@@ -265,7 +280,8 @@ TEST(ParseModePropertiesTest, FieldDelimMissingArg) {
   int index = 1;
   auto result = parse_mode_properties(sub.argc(), sub.argv(), index, opts);
   ASSERT_FALSE(result.has_value());
-  EXPECT_NE(result.error().find("option requires an argument"), std::string::npos);
+  EXPECT_NE(result.error().find("option requires an argument"),
+            std::string::npos);
 }
 
 // spec_id: SPEC-3  validates_req: REQ-006  tc: TC-REQ006-06
@@ -293,7 +309,7 @@ TEST(CollectFilesTest, TwoDistinctFiles) {
 }
 
 // spec_id: SPEC-3  validates_req: REQ-007  tc: TC-REQ007-02
-TEST(CollectFilesTest, DeduplicatesFirstOccurrence) {
+TEST(CollectFilesTest, RemovesDuplicatePaths) {
   ArgvHolder holder{{"cut", "-f1", "a.txt", "-", "b.txt", "-", "a.txt"}};
   auto files = collect_files(holder.argc(), holder.argv(), 2);
   ASSERT_EQ(files.size(), 3U);
@@ -310,7 +326,7 @@ TEST(CollectFilesTest, NoFiles) {
 }
 
 // spec_id: SPEC-3  validates_req: REQ-007  tc: TC-REQ007-04
-TEST(CollectFilesTest, StdinDedup) {
+TEST(CollectFilesTest, StdinDeduplicated) {
   ArgvHolder holder{{"cut", "-f1", "-", "-"}};
   auto files = collect_files(holder.argc(), holder.argv(), 2);
   ASSERT_EQ(files.size(), 1U);
@@ -326,9 +342,10 @@ TEST(ParseArgsTest, NoArgs) {
   ArgvHolder holder{{"cut"}};
   auto result = parse_args(holder.argc(), holder.argv());
   ASSERT_FALSE(result.has_value());
-  EXPECT_EQ(result.error(),
-    "cc-cut-tool: you must specify a list of bytes, characters, or fields\n"
-    "Try 'cc-cut-tool --help' for more information.");
+  EXPECT_EQ(
+      result.error(),
+      "cc-cut-tool: you must specify a list of bytes, characters, or fields\n"
+      "Try 'cc-cut-tool --help' for more information.");
 }
 
 // spec_id: SPEC-3  validates_req: REQ-003  tc: TC-REQ003-02
@@ -369,7 +386,7 @@ TEST(ErrorFormatTest, EndsWithHelpHint) {
   auto result = parse_args(holder.argc(), holder.argv());
   ASSERT_FALSE(result.has_value());
   EXPECT_TRUE(result.error().ends_with(
-    "Try 'cc-cut-tool --help' for more information."));
+      "Try 'cc-cut-tool --help' for more information."));
 }
 
 // spec_id: SPEC-3  validates_req: REQ-008  tc: TC-REQ008-03
@@ -378,8 +395,8 @@ TEST(ErrorFormatTest, ByteModeZeroPosition) {
   auto result = parse_args(holder.argc(), holder.argv());
   ASSERT_FALSE(result.has_value());
   EXPECT_EQ(result.error(),
-    "cc-cut-tool: byte/character positions are numbered from 1\n"
-    "Try 'cc-cut-tool --help' for more information.");
+            "cc-cut-tool: byte/character positions are numbered from 1\n"
+            "Try 'cc-cut-tool --help' for more information.");
 }
 
 // spec_id: SPEC-3  validates_req: REQ-008  tc: TC-REQ008-04
@@ -388,8 +405,8 @@ TEST(ErrorFormatTest, FieldModeZeroPosition) {
   auto result = parse_args(holder.argc(), holder.argv());
   ASSERT_FALSE(result.has_value());
   EXPECT_EQ(result.error(),
-    "cc-cut-tool: fields are numbered from 1\n"
-    "Try 'cc-cut-tool --help' for more information.");
+            "cc-cut-tool: fields are numbered from 1\n"
+            "Try 'cc-cut-tool --help' for more information.");
 }
 
 // spec_id: SPEC-3  validates_req: REQ-008  tc: TC-REQ008-05
@@ -398,8 +415,8 @@ TEST(ErrorFormatTest, CharModeZeroPosition) {
   auto result = parse_args(holder.argc(), holder.argv());
   ASSERT_FALSE(result.has_value());
   EXPECT_EQ(result.error(),
-    "cc-cut-tool: byte/character positions are numbered from 1\n"
-    "Try 'cc-cut-tool --help' for more information.");
+            "cc-cut-tool: byte/character positions are numbered from 1\n"
+            "Try 'cc-cut-tool --help' for more information.");
 }
 
 // ---------------------------------------------------------------------------
@@ -411,9 +428,10 @@ TEST(NoModeTest, NoArguments) {
   ArgvHolder holder{{"cut"}};
   auto result = parse_args(holder.argc(), holder.argv());
   ASSERT_FALSE(result.has_value());
-  EXPECT_EQ(result.error(),
-    "cc-cut-tool: you must specify a list of bytes, characters, or fields\n"
-    "Try 'cc-cut-tool --help' for more information.");
+  EXPECT_EQ(
+      result.error(),
+      "cc-cut-tool: you must specify a list of bytes, characters, or fields\n"
+      "Try 'cc-cut-tool --help' for more information.");
 }
 
 // spec_id: SPEC-3  validates_req: REQ-009  tc: TC-REQ009-02
@@ -421,9 +439,10 @@ TEST(NoModeTest, FileAsFirstArg) {
   ArgvHolder holder{{"cut", "file.txt"}};
   auto result = parse_args(holder.argc(), holder.argv());
   ASSERT_FALSE(result.has_value());
-  EXPECT_EQ(result.error(),
-    "cc-cut-tool: you must specify a list of bytes, characters, or fields\n"
-    "Try 'cc-cut-tool --help' for more information.");
+  EXPECT_EQ(
+      result.error(),
+      "cc-cut-tool: you must specify a list of bytes, characters, or fields\n"
+      "Try 'cc-cut-tool --help' for more information.");
 }
 
 // spec_id: SPEC-3  validates_req: REQ-009  tc: TC-REQ009-03
@@ -431,9 +450,10 @@ TEST(NoModeTest, DoubleDash) {
   ArgvHolder holder{{"cut", "--"}};
   auto result = parse_args(holder.argc(), holder.argv());
   ASSERT_FALSE(result.has_value());
-  EXPECT_EQ(result.error(),
-    "cc-cut-tool: you must specify a list of bytes, characters, or fields\n"
-    "Try 'cc-cut-tool --help' for more information.");
+  EXPECT_EQ(
+      result.error(),
+      "cc-cut-tool: you must specify a list of bytes, characters, or fields\n"
+      "Try 'cc-cut-tool --help' for more information.");
 }
 
 // ---------------------------------------------------------------------------

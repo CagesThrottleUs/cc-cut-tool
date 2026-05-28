@@ -1,9 +1,9 @@
 // include/cut/parse_result.hpp
 #pragma once
-#include "cut/options.hpp"
-
 #include <string>
 #include <vector>
+
+#include "cut/options.hpp"
 
 namespace cc_cut {
 
@@ -18,9 +18,9 @@ namespace cc_cut {
 ///   if (result && result->help_requested) { return 0; }
 /// @endcode
 struct ParseResult {
-  CutOptions               opts;
+  CutOptions opts;
   std::vector<std::string> files;
-  bool                     help_requested = false;
+  bool help_requested = false;
 };
 
 }  // namespace cc_cut

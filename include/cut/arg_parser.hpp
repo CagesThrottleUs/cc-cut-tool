@@ -1,12 +1,12 @@
 // include/cut/arg_parser.hpp
 #pragma once
-#include "cut/options.hpp"
-#include "cut/parse_result.hpp"
-
 #include <expected>
 #include <string>
 #include <string_view>
 #include <vector>
+
+#include "cut/options.hpp"
+#include "cut/parse_result.hpp"
 
 namespace cc_cut {
 
@@ -23,7 +23,8 @@ namespace cc_cut {
 /// @return      ParseResult on success; error string on failure.
 ///              Error string format: "cc-cut-tool: <msg>\nTry '...'".
 /// @throws      Never throws.
-auto parse_args(int argc, char** argv) -> std::expected<ParseResult, std::string>;
+auto parse_args(int argc, char** argv)
+    -> std::expected<ParseResult, std::string>;
 
 // spec_id: SPEC-3  req_id: REQ-004
 /// Identify the cut mode from the first CLI flag.
@@ -70,6 +71,7 @@ auto parse_mode_properties(int argc, char** argv, int& index, CutOptions& opts)
 /// @param argv   Argument vector.
 /// @param index  First position to collect from.
 /// @return       Deduplicated file paths in first-occurrence order.
-auto collect_files(int argc, char** argv, int index) -> std::vector<std::string>;
+auto collect_files(int argc, char** argv, int index)
+    -> std::vector<std::string>;
 
 }  // namespace cc_cut
