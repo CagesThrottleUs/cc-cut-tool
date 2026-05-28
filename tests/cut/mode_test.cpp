@@ -2,6 +2,7 @@
 #include "cut/mode.hpp"
 
 #include <gtest/gtest.h>
+
 #include <type_traits>
 
 // spec_id: SPEC-2  validates_req: REQ-011
