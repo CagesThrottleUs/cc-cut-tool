@@ -1,14 +1,15 @@
+// spec_id: SPEC-1  validates_req: REQ-002
 #include <gtest/gtest.h>
 #include "cut/list.hpp"
 
-// TC-REQ002-01
+// spec_id: SPEC-1  validates_req: REQ-002  tc: TC-REQ002-01
 TEST(CutListTest, DefaultInit) {
     CutList list;
     EXPECT_EQ(list.open_from, std::nullopt);
     EXPECT_TRUE(list.indices.empty());
 }
 
-// TC-REQ002-02
+// spec_id: SPEC-1  validates_req: REQ-002  tc: TC-REQ002-02
 TEST(CutListTest, SetOpenFrom) {
     CutList list;
     list.open_from = 2;
@@ -16,7 +17,7 @@ TEST(CutListTest, SetOpenFrom) {
     EXPECT_EQ(list.open_from.value(), 2);
 }
 
-// TC-REQ002-03
+// spec_id: SPEC-1  validates_req: REQ-002  tc: TC-REQ002-03
 TEST(CutListTest, InsertIndices) {
     CutList list;
     list.indices.insert({0, 2, 4});
