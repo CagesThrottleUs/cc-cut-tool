@@ -14,20 +14,9 @@ C++ implementation of the POSIX `cut` utility. Built with CMake + Ninja + Clang 
 | Boost | system | MMIO via Boost.Iostreams (SP-04+) |
 | clang-tidy | system | Static analysis (`.clang-tidy` config) |
 
-## Build
+## Build and Test
 
-```bash
-cmake --preset clang-debug         # configure
-cmake --build --preset clang-debug  # build
-```
-
-Release: replace `clang-debug` with `clang-release`.
-
-## Test
-
-```bash
-cd out/build/clang-debug && ctest --output-on-failure
-```
+See [README.md](README.md) for build and test commands.
 
 ### CTest Labels
 
@@ -37,12 +26,6 @@ cd out/build/clang-debug && ctest --output-on-failure
 | `integration` | Shell + Perl integration tests |
 | `user` | 8 user-specified cases |
 | `coreutils` | Perl coreutils test vectors |
-
-Unit tests only (exclude integration):
-
-```bash
-ctest --output-on-failure --exclude-regex "integ_"
-```
 
 ## Project Structure
 
