@@ -1,5 +1,6 @@
 #pragma once
 #include "cut/list.hpp"
+#include "cut/mode.hpp"
 #include <expected>
 #include <string>
 #include <string_view>
