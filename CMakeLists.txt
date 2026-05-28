@@ -19,6 +19,7 @@ configure_file(
 
 set(SRC_FILES
   src/list_parser.cpp
+  src/arg_parser.cpp
 )
 
 add_executable(${PROJECT_NAME} src/main.cpp ${SRC_FILES})
@@ -48,6 +49,7 @@ add_executable(${TEST_PROJECT_NAME}
   tests/cut/options_test.cpp
   tests/cut/file_source_test.cpp
   tests/cut/list_parser_test.cpp
+  tests/cut/arg_parser_test.cpp
   ${SRC_FILES}
 )
 
