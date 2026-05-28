@@ -1,7 +1,11 @@
 #include "cut/mmap_file_source.hpp"
 
+#include <exception>
 #include <filesystem>
 #include <ios>
+#include <optional>
+#include <string_view>
+#include <utility>
 
 namespace cc_cut {
 

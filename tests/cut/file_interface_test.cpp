@@ -127,8 +127,8 @@ TEST(NextLineTest, BlankLine) {
 
 // spec_id: SPEC-4  validates_req: REQ-003  tc: TC-REQ003-01
 TEST(StdinSourceTest, TwoLinesWithTrailingNewline) {
-  std::istringstream ss{"line1\nline2\n"};
-  const auto old_buf = std::cin.rdbuf(ss.rdbuf());
+  std::istringstream input_ss{"line1\nline2\n"};
+  auto* const old_buf = std::cin.rdbuf(input_ss.rdbuf());
   StdinSource src;
   src.load();
   std::cin.rdbuf(old_buf);
@@ -139,8 +139,8 @@ TEST(StdinSourceTest, TwoLinesWithTrailingNewline) {
 
 // spec_id: SPEC-4  validates_req: REQ-003  tc: TC-REQ003-02
 TEST(StdinSourceTest, NoTrailingNewline) {
-  std::istringstream ss{"line1\nline2"};
-  const auto old_buf = std::cin.rdbuf(ss.rdbuf());
+  std::istringstream input_ss{"line1\nline2"};
+  auto* const old_buf = std::cin.rdbuf(input_ss.rdbuf());
   StdinSource src;
   src.load();
   std::cin.rdbuf(old_buf);
@@ -151,8 +151,8 @@ TEST(StdinSourceTest, NoTrailingNewline) {
 
 // spec_id: SPEC-4  validates_req: REQ-003  tc: TC-REQ003-03
 TEST(StdinSourceTest, EmptyStdin) {
-  std::istringstream ss{""};
-  const auto old_buf = std::cin.rdbuf(ss.rdbuf());
+  std::istringstream input_ss{""};
+  auto* const old_buf = std::cin.rdbuf(input_ss.rdbuf());
   StdinSource src;
   src.load();
   std::cin.rdbuf(old_buf);
@@ -161,8 +161,8 @@ TEST(StdinSourceTest, EmptyStdin) {
 
 // spec_id: SPEC-4  validates_req: REQ-003  tc: TC-REQ003-04
 TEST(StdinSourceTest, CrlfPreserved) {
-  std::istringstream ss{"a\r\nb"};
-  const auto old_buf = std::cin.rdbuf(ss.rdbuf());
+  std::istringstream input_ss{"a\r\nb"};
+  auto* const old_buf = std::cin.rdbuf(input_ss.rdbuf());
   StdinSource src;
   src.load();
   std::cin.rdbuf(old_buf);
@@ -283,8 +283,8 @@ TEST(MakeFileSourceTest, NonExistentReturnsError) {
 
 // spec_id: SPEC-4  validates_req: REQ-006  tc: TC-REQ006-04
 TEST(MakeFileSourceTest, FactoryDoesNotCallLoad) {
-  std::istringstream ss{"hello\n"};
-  const auto old_buf = std::cin.rdbuf(ss.rdbuf());
+  std::istringstream input_ss{"hello\n"};
+  auto* const old_buf = std::cin.rdbuf(input_ss.rdbuf());
   auto result = make_file_source("-");
   ASSERT_TRUE(result.has_value());
   result->get()->load();

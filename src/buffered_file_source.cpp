@@ -1,7 +1,11 @@
 #include "cut/buffered_file_source.hpp"
 
+#include <filesystem>
 #include <fstream>
 #include <iterator>
+#include <optional>
+#include <string_view>
+#include <utility>
 
 namespace cc_cut {
 

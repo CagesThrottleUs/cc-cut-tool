@@ -2,6 +2,8 @@
 
 #include <iostream>
 #include <iterator>
+#include <optional>
+#include <string_view>
 
 namespace cc_cut {
 
