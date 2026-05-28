@@ -1,9 +1,13 @@
 #pragma once
+#include <cstddef>
 #include <optional>
 #include <string_view>
 
 // spec_id: SPEC-2  req_id: REQ-011
 namespace cc_cut {
+
+// spec_id: SPEC-4  req_id: REQ-001
+inline constexpr std::size_t mmap_threshold = 100ULL * 1024ULL * 1024ULL;
 
 // spec_id: SPEC-1  req_id: REQ-004
 /// Abstract source for line-oriented reading of a single input.
@@ -28,11 +32,11 @@ namespace cc_cut {
 /// @endcode
 class FileSource {
  public:
-  FileSource() = default;
-  FileSource(const FileSource&) = delete;
+  FileSource()                                     = default;
+  FileSource(const FileSource&)                    = delete;
   auto operator=(const FileSource&) -> FileSource& = delete;
-  FileSource(FileSource&&) = delete;
-  auto operator=(FileSource&&) -> FileSource& = delete;
+  FileSource(FileSource&&)                         = delete;
+  auto operator=(FileSource&&)      -> FileSource& = delete;
 
   // spec_id: SPEC-1  req_id: REQ-004
   /// Reads the entire input into an internal buffer.
@@ -58,6 +62,27 @@ class FileSource {
   virtual auto getline() -> std::optional<std::string_view> = 0;
 
   virtual ~FileSource() = default;
+
+ protected:
+  // spec_id: SPEC-4  req_id: REQ-002
+  /// Returns [cursor, next-newline) without the newline. Advances cursor past it.
+  /// Returns nullopt when cursor >= buffer.size().
+  /// CR before LF is included — no CRLF normalization.
+  static auto next_line(std::string_view buffer, std::size_t& cursor)
+      -> std::optional<std::string_view> {
+    if (cursor >= buffer.size()) {
+      return std::nullopt;
+    }
+    const auto pos = buffer.find('\n', cursor);
+    if (pos == std::string_view::npos) {
+      const auto result = buffer.substr(cursor);
+      cursor = buffer.size();
+      return result;
+    }
+    const auto result = buffer.substr(cursor, pos - cursor);
+    cursor = pos + 1;
+    return result;
+  }
 };
 
 }  // namespace cc_cut
