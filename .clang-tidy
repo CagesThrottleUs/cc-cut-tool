@@ -10,4 +10,5 @@ Checks: >
   modernize-*,
   performance-*,
   portability-*,
+  -portability-avoid-pragma-once,
   readability-*,
