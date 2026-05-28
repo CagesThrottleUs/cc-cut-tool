@@ -7,7 +7,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # ----------------------------- Find Packages -----------------------------
 
-find_package(Boost REQUIRED)
+find_package(Boost REQUIRED COMPONENTS iostreams)
 
 configure_file(
     "${CMAKE_CURRENT_SOURCE_DIR}/include/cut/config.hpp.in"
@@ -20,6 +20,10 @@ configure_file(
 set(SRC_FILES
   src/list_parser.cpp
   src/arg_parser.cpp
+  src/stdin_source.cpp
+  src/buffered_file_source.cpp
+  src/mmap_file_source.cpp
+  src/make_file_source.cpp
 )
 
 add_executable(${PROJECT_NAME} src/main.cpp ${SRC_FILES})
@@ -28,6 +32,10 @@ target_include_directories(${PROJECT_NAME} PRIVATE
   ${CMAKE_CURRENT_SOURCE_DIR}/include
   ${CMAKE_CURRENT_SOURCE_DIR}/src
   ${CMAKE_CURRENT_BINARY_DIR}/include
+)
+
+target_link_libraries(${PROJECT_NAME} PRIVATE
+  Boost::iostreams
 )
 
 # ----------------------------- Testing -----------------------------
@@ -50,6 +58,7 @@ add_executable(${TEST_PROJECT_NAME}
   tests/cut/file_source_test.cpp
   tests/cut/list_parser_test.cpp
   tests/cut/arg_parser_test.cpp
+  tests/cut/file_interface_test.cpp
   ${SRC_FILES}
 )
 
@@ -61,6 +70,7 @@ target_include_directories(${TEST_PROJECT_NAME} PRIVATE
 
 target_link_libraries(${TEST_PROJECT_NAME} PRIVATE
   GTest::gtest_main
+  Boost::iostreams
 )
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
