@@ -1,12 +1,12 @@
 // include/cut/field_processor.hpp
 #pragma once
-#include "cut/list.hpp"
-#include "cut/options.hpp"
-
 #include <iosfwd>
 #include <string>
 #include <string_view>
 #include <vector>
+
+#include "cut/list.hpp"
+#include "cut/options.hpp"
 
 namespace cc_cut {
 
@@ -31,13 +31,15 @@ class FieldProcessor {
   // spec_id: SPEC-5  req_id: REQ-003
   /// Splits line on runs of ASCII space/tab. Leading/trailing whitespace and
   /// consecutive whitespace produce no empty fields.
-  static auto split_fields(std::string_view line) -> std::vector<std::string_view>;
+  static auto split_fields(std::string_view line)
+      -> std::vector<std::string_view>;
 
   // spec_id: SPEC-5  req_id: REQ-004
   /// Returns fields selected by list in ascending position order.
   /// Positions beyond fields.size() produce empty string_view entries.
   static auto select_fields(const std::vector<std::string_view>& fields,
-                             const CutList& list) -> std::vector<std::string_view>;
+                            const CutList& list)
+      -> std::vector<std::string_view>;
 
   // spec_id: SPEC-5  req_id: REQ-005
   /// Processes one line: splits, selects, joins with delimiter, writes to out.
