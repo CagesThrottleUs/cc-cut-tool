@@ -22,7 +22,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 
 # ----------------------------- Testing -----------------------------
 
-set(TEST_PROJECT_NAME ${PROJECT_NAME}_test)
+set(TEST_PROJECT_NAME ${PROJECT_NAME}-test)
 
 include(FetchContent)
 FetchContent_Declare(
@@ -51,3 +51,4 @@ gtest_discover_tests(${TEST_PROJECT_NAME}
 
 # Integration Tests
 
+add_subdirectory(integrations)

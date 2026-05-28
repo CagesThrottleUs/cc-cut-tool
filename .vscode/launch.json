@@ -29,7 +29,7 @@
         "id": "inputFilePath",
         "type": "promptString",
         "description": "Input file to cut",
-        "default": "sample/test.txt"
+        "default": "sample/sample.tsv"
       }
     ]
   }
