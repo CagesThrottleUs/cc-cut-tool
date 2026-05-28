@@ -1,0 +1,53 @@
+cmake_minimum_required(VERSION 4.0.0)
+project(cc-cut-tool VERSION 0.1.0 LANGUAGES C CXX)
+
+set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+# ----------------------------- Find Packages -----------------------------
+
+
+# ----------------------------- Main Executable -----------------------------
+
+set(SRC_FILES
+)
+
+add_executable(${PROJECT_NAME} src/main.cpp ${SRC_FILES})
+
+target_include_directories(${PROJECT_NAME} PRIVATE
+  ${CMAKE_CURRENT_SOURCE_DIR}/include
+  ${CMAKE_CURRENT_SOURCE_DIR}/src
+)
+
+# ----------------------------- Testing -----------------------------
+
+set(TEST_PROJECT_NAME ${PROJECT_NAME}_test)
+
+include(FetchContent)
+FetchContent_Declare(
+    googletest
+    URL https://github.com/google/googletest/archive/8736d2cd5c1dcba41170ed2fddca14021d4916c3.zip
+)
+FetchContent_MakeAvailable(googletest)
+
+enable_testing()
+
+add_executable(${TEST_PROJECT_NAME} 
+  ${SRC_FILES}
+)
+
+target_include_directories(${TEST_PROJECT_NAME} PRIVATE
+  ${CMAKE_CURRENT_SOURCE_DIR}/include
+  ${CMAKE_CURRENT_SOURCE_DIR}/src
+)
+
+
+include(GoogleTest)
+gtest_discover_tests(${TEST_PROJECT_NAME}
+  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+)
+
+
+# Integration Tests
+

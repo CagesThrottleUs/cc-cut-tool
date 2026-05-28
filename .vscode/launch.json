@@ -1,0 +1,35 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "name": "Debug app",
+        "type": "cppdbg",
+        "request": "launch",
+        "program": "${workspaceFolder}/out/build/clang-debug/cc-cut-tool",
+        "args": [],
+        "cwd": "${workspaceFolder}",
+        "stopAtEntry": false,
+        "preLaunchTask": "build (debug) with configure",
+        "MIMode": "lldb"
+      },
+      {
+        "name": "Debug tests",
+        "type": "cppdbg",
+        "request": "launch",
+        "program": "${workspaceFolder}/out/build/clang-debug/cc-cut-tool_test",
+        "args": [],
+        "cwd": "${workspaceFolder}",
+        "stopAtEntry": false,
+        "preLaunchTask": "build (debug) with configure",
+        "MIMode": "lldb"
+      }
+    ],
+    "inputs": [
+      {
+        "id": "inputFilePath",
+        "type": "promptString",
+        "description": "Input file to cut",
+        "default": "sample/test.txt"
+      }
+    ]
+  }
