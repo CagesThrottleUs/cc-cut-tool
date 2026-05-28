@@ -209,7 +209,7 @@ result to `out`. Behavior:
 
 ### REQ-006: run — File Loop
 
-**Statement:** `FieldProcessor::run(const std::vector<std::string>& files, std::ostream& out, std::ostream& err)`
+**Statement:** `FieldProcessor::run(std::ostream& out, const std::vector<std::string>& files, std::ostream& err)`
 SHALL process all inputs and return `int` exit code (0 = all success, 1 = any error).
 Behavior:
 - If `files` is empty: process stdin via `make_file_source("-")`
@@ -256,7 +256,7 @@ dispatch as follows:
 - If `result.opts.mode != CutMode::FIELD`: write
   `"cc-cut-tool: byte and character modes not yet implemented\n"` to stderr,
   return 1
-- Otherwise: return `cc_cut::FieldProcessor{result.opts}.run(result.files, std::cout, std::cerr)`
+- Otherwise: return `cc_cut::FieldProcessor{result.opts}.run(std::cout, result.files, std::cerr)`
 
 **Acceptance Criteria:**
 - [ ] `./cc-cut-tool -f1 <file>` prints first field of each line and exits 0

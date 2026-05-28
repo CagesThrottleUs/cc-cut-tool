@@ -51,7 +51,7 @@ class FieldProcessor {
   /// Processes all files (or stdin if files is empty).
   /// Continues past individual file errors; writes errors to err.
   /// Returns 0 on full success, 1 if any file error occurred.
-  auto run(const std::vector<std::string>& files, std::ostream& out,
+  auto run(std::ostream& out, const std::vector<std::string>& files,
            std::ostream& err) -> int;
 
  private:

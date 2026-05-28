@@ -120,9 +120,9 @@ void FieldProcessor::process_line(std::string_view line, std::ostream& out) {
   out << '\n';
 }
 
-auto FieldProcessor::run(const std::vector<std::string>& files,
-                         // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
-                         std::ostream& out, std::ostream& err) -> int {
+auto FieldProcessor::run(std::ostream& out,
+                         const std::vector<std::string>& files,
+                         std::ostream& err) -> int {
   int exit_code = 0;
 
   const auto process_source = [&](const std::string& path) -> void {

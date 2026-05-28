@@ -256,9 +256,9 @@ TEST(RunTest, ValidFileReturnsZero) {
   const auto path = make_temp_file_sp05("a,b\n");
   std::ostringstream out;
   std::ostringstream err;
-  const int rc =
-      FieldProcessor{make_opts_field(',', {0})}.run({path.string()}, out, err);
-  EXPECT_EQ(rc, 0);
+  const int ret =
+      FieldProcessor{make_opts_field(',', {0})}.run(out, {path.string()}, err);
+  EXPECT_EQ(ret, 0);
   EXPECT_EQ(out.str(), "a\n");
   std::filesystem::remove(path);
 }
@@ -267,9 +267,9 @@ TEST(RunTest, ValidFileReturnsZero) {
 TEST(RunTest, NonExistentFileReturnsOne) {
   std::ostringstream out;
   std::ostringstream err;
-  const int rc = FieldProcessor{make_opts_field(',', {0})}.run(
-      {"/tmp/sp05_no_such_xyz.txt"}, out, err);
-  EXPECT_EQ(rc, 1);
+  const int ret = FieldProcessor{make_opts_field(',', {0})}.run(
+      out, {"/tmp/sp05_no_such_xyz.txt"}, err);
+  EXPECT_EQ(ret, 1);
   EXPECT_NE(err.str().find("/tmp/sp05_no_such_xyz.txt"), std::string::npos);
 }
 
@@ -278,9 +278,9 @@ TEST(RunTest, ContinuesAfterOneError) {
   const auto path = make_temp_file_sp05("x,y\n");
   std::ostringstream out;
   std::ostringstream err;
-  const int rc = FieldProcessor{make_opts_field(',', {0})}.run(
-      {"/tmp/sp05_no_such_xyz.txt", path.string()}, out, err);
-  EXPECT_EQ(rc, 1);
+  const int ret = FieldProcessor{make_opts_field(',', {0})}.run(
+      out, {"/tmp/sp05_no_such_xyz.txt", path.string()}, err);
+  EXPECT_EQ(ret, 1);
   EXPECT_EQ(out.str(), "x\n");
   std::filesystem::remove(path);
 }
@@ -288,11 +288,11 @@ TEST(RunTest, ContinuesAfterOneError) {
 // spec_id: SPEC-5  validates_req: REQ-006  tc: TC-REQ006-04
 TEST(RunTest, EmptyFilesListReadStdin) {
   std::istringstream input_ss{"a,b\n"};
-  const auto old_buf = std::cin.rdbuf(input_ss.rdbuf());
+  auto* const old_buf = std::cin.rdbuf(input_ss.rdbuf());
   std::ostringstream out;
   std::ostringstream err;
-  const int rc = FieldProcessor{make_opts_field(',', {0})}.run({}, out, err);
+  const int ret = FieldProcessor{make_opts_field(',', {0})}.run(out, {}, err);
   std::cin.rdbuf(old_buf);
-  EXPECT_EQ(rc, 0);
+  EXPECT_EQ(ret, 0);
   EXPECT_EQ(out.str(), "a\n");
 }
