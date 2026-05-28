@@ -52,6 +52,11 @@ target_link_libraries(${TEST_PROJECT_NAME} PRIVATE
   GTest::gtest_main
 )
 
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+  target_compile_options(${TEST_PROJECT_NAME} PRIVATE -fsanitize=address)
+  target_link_options(${TEST_PROJECT_NAME} PRIVATE -fsanitize=address)
+endif()
+
 
 include(GoogleTest)
 gtest_discover_tests(${TEST_PROJECT_NAME}
