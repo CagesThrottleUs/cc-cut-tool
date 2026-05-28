@@ -80,7 +80,7 @@ sample/               Sample data files (TSV, CSV)
 | SP-02 List Parser | ✅ Complete |
 | SP-03 Arg Parser | Pending |
 | SP-04 File Interface | ✅ Complete |
-| SP-05 Field Mode | Pending |
+| SP-05 Field Mode | ✅ Complete |
 | SP-06 Byte Mode | Pending |
 | SP-07 Char Mode | Pending |
 | SP-08 Integration Pass | Pending |

@@ -24,6 +24,7 @@ set(SRC_FILES
   src/buffered_file_source.cpp
   src/mmap_file_source.cpp
   src/make_file_source.cpp
+  src/field_processor.cpp
 )
 
 add_executable(${PROJECT_NAME} src/main.cpp ${SRC_FILES})
@@ -59,6 +60,7 @@ add_executable(${TEST_PROJECT_NAME}
   tests/cut/list_parser_test.cpp
   tests/cut/arg_parser_test.cpp
   tests/cut/file_interface_test.cpp
+  tests/cut/field_processor_test.cpp
   ${SRC_FILES}
 )
 
