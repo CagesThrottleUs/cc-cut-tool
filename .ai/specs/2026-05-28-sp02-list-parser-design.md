@@ -20,22 +20,32 @@ provides the single pure function that converts this raw string into a `CutList`
 SP-02 has no knowledge of mode (BYTE/CHARACTER/FIELD). Mode-specific error message
 formatting belongs to the arg parser (SP-03).
 
+All types and functions in this project live in the `cc_cut` namespace. SP-02
+introduces the first `.cpp` translation unit and establishes the namespace
+convention. SP-01 types (SPEC-1) must be retroactively wrapped in the same
+namespace as part of this sub-project.
+
 ## Scope
 
 **In scope:**
-- `parse_list(list_arg)` — free function declared in `include/cut/list_parser.hpp`,
-  implemented in `src/list_parser.cpp`
+- Wrap all four SP-01 headers (`mode.hpp`, `list.hpp`, `options.hpp`,
+  `file_source.hpp`) in `namespace cc_cut {}`
+- Update SP-01 unit tests to use `using namespace cc_cut;`
+- `cc_cut::parse_list(list_arg)` — free function declared in
+  `include/cut/list_parser.hpp`, implemented in `src/list_parser.cpp`,
+  inside `namespace cc_cut {}`
 - Tokenization: comma-split when comma present, whitespace-split otherwise
 - Token classification: plain number, `N-M` range, `-M` open-start, `N-` open-end
 - Error detection: empty input, position 0, decreasing range, lone dash,
   unrecognised token, multiple dashes
-- Return type: `std::expected<CutList, std::string>`
+- Return type: `std::expected<cc_cut::CutList, std::string>`
 
 **Out of scope:**
 - Mode-specific error message formatting (e.g. "fields are numbered from 1") — SP-03
 - Validation of `list_arg` against actual line length — SP-05 through SP-07
 - Parsing of `-b`, `-c`, `-f` flag names — SP-03
 - `--complement` flag — not in SYNOPSIS
+- Nested namespaces or inline namespaces — flat `cc_cut` only
 
 ---
 
@@ -44,14 +54,15 @@ formatting belongs to the arg parser (SP-03).
 ### REQ-001: Function Signature
 
 **Statement:** The project SHALL declare a free function
-`parse_list(std::string_view list_arg) -> std::expected<CutList, std::string>`
-in `include/cut/list_parser.hpp` and implement it in `src/list_parser.cpp`.
+`cc_cut::parse_list(std::string_view list_arg) -> std::expected<cc_cut::CutList, std::string>`
+in `include/cut/list_parser.hpp` (inside `namespace cc_cut {}`) and implement it
+in `src/list_parser.cpp` (also inside `namespace cc_cut {}`).
 
 **Acceptance Criteria:**
 - [ ] `#include "cut/list_parser.hpp"` compiles from any translation unit that
       includes `include/` in its search path
-- [ ] Function is callable with a `std::string_view` argument and the return
-      type is `std::expected<CutList, std::string>`
+- [ ] Function is callable as `cc_cut::parse_list(...)` with a `std::string_view`
+      argument; return type is `std::expected<cc_cut::CutList, std::string>`
 - [ ] Function has no side effects — calling it twice with the same input returns
       identical results
 
@@ -288,6 +299,34 @@ token string.
 
 ---
 
+### REQ-011: Namespace cc_cut
+
+**Statement:** All types from SPEC-1 (`CutMode`, `CutList`, `CutOptions`,
+`FileSource`) and the `parse_list` function from SPEC-2 SHALL be declared
+inside `namespace cc_cut {}`. No public symbol from the `cut/` headers
+SHALL reside in the global namespace.
+
+**Acceptance Criteria:**
+- [ ] `cc_cut::CutMode::FIELD` compiles; `CutMode::FIELD` (without qualifier
+      or `using`) does not compile
+- [ ] `cc_cut::parse_list("1")` compiles and returns `std::expected<cc_cut::CutList, std::string>`
+- [ ] All four SP-01 headers define their types inside `namespace cc_cut {}`
+- [ ] `src/list_parser.cpp` defines `parse_list` inside `namespace cc_cut {}`
+- [ ] Existing SP-01 unit tests compile after adding `using namespace cc_cut;`
+      at file scope within each test file
+
+**Dependencies:**
+| Dependency | Assumed Behavior |
+|-----------|-----------------|
+| C++23 namespace rules | `namespace cc_cut {}` wrapping a header does not change ABI or linkage |
+
+**Test Cases:**
+- TC-REQ011-01: `static_assert` that `std::is_same_v<decltype(cc_cut::CutMode::FIELD), cc_cut::CutMode>` compiles and passes
+- TC-REQ011-02: Translation unit that includes `"cut/mode.hpp"` and uses `CutMode::FIELD` (no qualifier, no `using`) fails to compile
+- TC-REQ011-03: All 10 existing SP-01 tests pass after `using namespace cc_cut;` added to each test file
+
+---
+
 ## Assumptions
 
 | ID | Assumption | Impact if Wrong | Verified By |
@@ -312,3 +351,4 @@ token string.
 | REQ-008 | Zero position error | TC-REQ008-01, TC-REQ008-02, TC-REQ008-03 | 🔴 Pending |
 | REQ-009 | Invalid token error | TC-REQ009-01, TC-REQ009-02, TC-REQ009-03, TC-REQ009-04, TC-REQ009-05 | 🔴 Pending |
 | REQ-010 | Empty input error | TC-REQ010-01, TC-REQ010-02 | 🔴 Pending |
+| REQ-011 | Namespace cc_cut | TC-REQ011-01, TC-REQ011-02, TC-REQ011-03 | 🔴 Pending |
