@@ -7,6 +7,8 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # ----------------------------- Find Packages -----------------------------
 
+find_package(Boost REQUIRED)
+
 
 # ----------------------------- Main Executable -----------------------------
 
@@ -33,13 +35,21 @@ FetchContent_MakeAvailable(googletest)
 
 enable_testing()
 
-add_executable(${TEST_PROJECT_NAME} 
+add_executable(${TEST_PROJECT_NAME}
+  tests/cut/mode_test.cpp
+  tests/cut/list_test.cpp
+  tests/cut/options_test.cpp
+  tests/cut/file_source_test.cpp
   ${SRC_FILES}
 )
 
 target_include_directories(${TEST_PROJECT_NAME} PRIVATE
   ${CMAKE_CURRENT_SOURCE_DIR}/include
   ${CMAKE_CURRENT_SOURCE_DIR}/src
+)
+
+target_link_libraries(${TEST_PROJECT_NAME} PRIVATE
+  GTest::gtest_main
 )
 
 
