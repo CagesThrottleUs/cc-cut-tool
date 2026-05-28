@@ -9,13 +9,13 @@ MmapFileSource::MmapFileSource(std::filesystem::path path)
     : path_(std::move(path)) {}
 
 void MmapFileSource::load() {
-  // mmap of a zero-byte file is undefined on most OSes; short-circuit.
-  if (std::filesystem::file_size(path_) == 0) {
-    buffer_ = std::string_view{};
-    cursor_ = 0;
-    return;
-  }
   try {
+    // mmap of a zero-byte file is undefined on most OSes; short-circuit.
+    if (std::filesystem::file_size(path_) == 0) {
+      buffer_ = std::string_view{};
+      cursor_ = 0;
+      return;
+    }
     map_.open(path_.string());
   } catch (const std::exception& ex) {
     throw std::ios_base::failure(ex.what());
