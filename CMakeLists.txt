@@ -9,6 +9,11 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 find_package(Boost REQUIRED)
 
+configure_file(
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/cut/config.hpp.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/include/cut/config.hpp"
+    @ONLY
+)
 
 # ----------------------------- Main Executable -----------------------------
 
@@ -21,6 +26,7 @@ add_executable(${PROJECT_NAME} src/main.cpp ${SRC_FILES})
 target_include_directories(${PROJECT_NAME} PRIVATE
   ${CMAKE_CURRENT_SOURCE_DIR}/include
   ${CMAKE_CURRENT_SOURCE_DIR}/src
+  ${CMAKE_CURRENT_BINARY_DIR}/include
 )
 
 # ----------------------------- Testing -----------------------------
@@ -48,6 +54,7 @@ add_executable(${TEST_PROJECT_NAME}
 target_include_directories(${TEST_PROJECT_NAME} PRIVATE
   ${CMAKE_CURRENT_SOURCE_DIR}/include
   ${CMAKE_CURRENT_SOURCE_DIR}/src
+  ${CMAKE_CURRENT_BINARY_DIR}/include
 )
 
 target_link_libraries(${TEST_PROJECT_NAME} PRIVATE
