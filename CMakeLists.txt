@@ -27,6 +27,7 @@ set(SRC_FILES
   src/field_processor.cpp
   src/processor.cpp
   src/byte_processor.cpp
+  src/char_processor.cpp
 )
 
 add_executable(${PROJECT_NAME} src/main.cpp ${SRC_FILES})
@@ -64,6 +65,7 @@ add_executable(${TEST_PROJECT_NAME}
   tests/cut/file_interface_test.cpp
   tests/cut/field_processor_test.cpp
   tests/cut/byte_processor_test.cpp
+  tests/cut/char_processor_test.cpp
   ${SRC_FILES}
 )
 
