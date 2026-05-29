@@ -1,5 +1,6 @@
 // spec_id: SPEC-5  validates_req: REQ-001,REQ-002,REQ-003,REQ-004,REQ-005,REQ-006,REQ-007
 #include "cut/field_processor.hpp"
+#include "cut/processor.hpp"
 
 #include <gtest/gtest.h>
 
@@ -32,6 +33,10 @@ TEST(FieldProcessorTest, ConstructsFromCutOptions) {
 // spec_id: SPEC-5  validates_req: REQ-001  tc: TC-REQ001-02
 static_assert(std::is_constructible_v<FieldProcessor, CutOptions>,
               "TC-REQ001-02: FieldProcessor must be constructible from CutOptions");
+
+// spec_id: SPEC-6  validates_req: REQ-006  tc: TC-REQ006-05
+static_assert(std::is_base_of_v<cc_cut::Processor, cc_cut::FieldProcessor>,
+              "TC-REQ006-05: FieldProcessor must inherit Processor");
 
 // ---------------------------------------------------------------------------
 // REQ-002: split_fields — exact delimiter
