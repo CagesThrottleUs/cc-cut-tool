@@ -52,6 +52,9 @@ include/cut/          Type-definition headers
   list.hpp            CutList struct (indices set + open_from)
   options.hpp         CutOptions struct (parsed CLI args)
   file_source.hpp     FileSource abstract interface
+  processor.hpp       Processor abstract base + make_processor factory
+  byte_processor.hpp  ByteProcessor class (SP-06)
+  field_processor.hpp FieldProcessor class (SP-05)
 
 src/main.cpp          Entry point
 tests/cut/            Unit tests (one file per header)
@@ -71,6 +74,8 @@ sample/               Sample data files (TSV, CSV)
 - `CutOptions::delim` is `std::optional<char>` — `nullopt` = whitespace-split, `some(c)` = exact char
 - `FileSource` deletes copy/move — consumed only via `unique_ptr<FileSource>`
 - Boost.Iostreams linked in CMake (SP-04); used by MmapFileSource
+- `Processor` abstract base + `make_processor` factory (SP-06) — all mode dispatch goes through factory; main.cpp contains no CutMode comparisons
+- `utf8cpp` vendored at `include/utf8.h` — used by ByteProcessor for `-n` UTF-8 boundary detection; `utf8::internal::validate_next` is 2-arg; invalid bytes treated as 1-byte chars (ASM-002)
 
 ## Sub-Project Status
 
@@ -81,6 +86,6 @@ sample/               Sample data files (TSV, CSV)
 | SP-03 Arg Parser | Pending |
 | SP-04 File Interface | ✅ Complete |
 | SP-05 Field Mode | ✅ Complete |
-| SP-06 Byte Mode | Pending |
+| SP-06 Byte Mode | ✅ Complete |
 | SP-07 Char Mode | Pending |
 | SP-08 Integration Pass | Pending |
