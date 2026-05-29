@@ -72,6 +72,14 @@ TEST(SelectCharsTest, OpenRange) {
   EXPECT_EQ(CharProcessor::select_chars("hello", make_open_list(3)), "lo");
 }
 
+// spec_id: SPEC-7  validates_req: REQ-002  tc: TC-REQ002-03b
+TEST(SelectCharsTest, OpenRangeWithMultibyte) {
+  // "h\xC3\xA9llo": h=cp0, é=cp1, l=cp2, l=cp3, o=cp4
+  // open_from=2 → codepoints 2,3,4 → "llo"
+  // A byte-counting bug would emit "llo" from byte offset 2 (inside é), producing garbage
+  EXPECT_EQ(CharProcessor::select_chars("h\xC3\xA9llo", make_open_list(2)), "llo");
+}
+
 // spec_id: SPEC-7  validates_req: REQ-002  tc: TC-REQ002-04
 TEST(SelectCharsTest, OutOfRangeCpSkipped) {
   EXPECT_EQ(CharProcessor::select_chars("hello", make_list({9})), "");
@@ -133,6 +141,12 @@ TEST(SelectCharsInvalidUtf8Test, InvalidLeadByteSelected) {
 // spec_id: SPEC-7  validates_req: REQ-003  tc: TC-REQ003-02
 TEST(SelectCharsInvalidUtf8Test, InvalidLeadByteNotSelected) {
   EXPECT_EQ(CharProcessor::select_chars("\x80", make_list({})), "");
+}
+
+// spec_id: SPEC-7  validates_req: REQ-003  tc: TC-REQ003-02b
+TEST(SelectCharsInvalidUtf8Test, InvalidLeadByteAtIndex0Selected) {
+  // Proves invalid byte is counted as codepoint index 0 — not skipped
+  EXPECT_EQ(CharProcessor::select_chars("\x80\x61", make_list({0})), "\x80");
 }
 
 // spec_id: SPEC-7  validates_req: REQ-003  tc: TC-REQ003-03

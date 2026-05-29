@@ -27,10 +27,6 @@ CharProcessor::CharProcessor(CutOptions opts) : opts_(std::move(opts)) {}
 auto CharProcessor::select_chars(std::string_view line,
                                  const CutList& list) -> std::string {
   std::string result;
-  const std::size_t open_start =
-      list.open_from.has_value()
-          ? static_cast<std::size_t>(list.open_from.value())
-          : std::numeric_limits<std::size_t>::max();
 
   // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
   const auto* const base = reinterpret_cast<const utf8::utfchar8_t*>(line.data());
@@ -51,7 +47,10 @@ auto CharProcessor::select_chars(std::string_view line,
     const bool in_indices =
         (cp_idx <= static_cast<std::size_t>(std::numeric_limits<int>::max())) &&
         list.indices.contains(static_cast<int>(cp_idx));
-    if (in_indices || cp_idx >= open_start) {
+    const bool in_open_range =
+        list.open_from.has_value() &&
+        std::cmp_greater_equal(cp_idx, list.open_from.value());
+    if (in_indices || in_open_range) {
       // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
       result.append(reinterpret_cast<const char*>(seq_start),
                     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
