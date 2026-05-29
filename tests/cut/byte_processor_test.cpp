@@ -341,12 +341,5 @@ TEST(MakeProcessorTest, FieldModeReturnsNonNullFieldProcessor) {
   EXPECT_NE(dynamic_cast<cc_cut::FieldProcessor*>(result->get()), nullptr);
 }
 
-// spec_id: SPEC-6  validates_req: REQ-006  tc: TC-REQ006-05
-TEST(MakeProcessorTest, CharacterModeReturnsError) {
-  cc_cut::CutOptions opts;
-  opts.mode = cc_cut::CutMode::CHARACTER;
-  auto result = cc_cut::make_processor(opts);
-  ASSERT_FALSE(result.has_value());
-  EXPECT_EQ(result.error(),
-            "cc-cut-tool: character mode not yet implemented");
-}
+// TC-REQ006-05 (CHARACTER mode returns CharProcessor) moved to
+// tests/cut/char_processor_test.cpp (MakeProcessorCharTest) in SP-07.
