@@ -22,8 +22,6 @@ auto make_processor(const CutOptions& opts)
     case CutMode::CHARACTER:
       return std::unexpected<std::string>{
           "cc-cut-tool: character mode not yet implemented"};
-    default:
-      return std::unexpected<std::string>{"cc-cut-tool: unknown mode"};
   }
 }
 
