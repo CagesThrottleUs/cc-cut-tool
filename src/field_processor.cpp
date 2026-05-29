@@ -84,8 +84,9 @@ auto FieldProcessor::select_fields(const std::vector<std::string_view>& fields,
       continue;
     }
     const auto idx = static_cast<std::size_t>(pos);
-    result.push_back(idx < fspan.size() ? fspan.subspan(idx).front()
-                                        : std::string_view{});
+    if (idx < fspan.size()) {
+      result.push_back(fspan.subspan(idx).front());
+    }
   }
   return result;
 }
@@ -108,7 +109,7 @@ void FieldProcessor::process_line(std::string_view line, std::ostream& out) {
                           : split_fields(line);
   const auto selected = select_fields(fields, opts_.list);
 
-  const char join_char = opts_.delim.value_or(' ');
+  const char join_char = opts_.delim.value_or(config::default_field_delim);
   bool first = true;
   for (const auto& field : selected) {
     if (!first) {

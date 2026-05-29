@@ -9,5 +9,7 @@ inline constexpr std::string_view program_name = "@PROJECT_NAME@";
 inline constexpr std::string_view version = "@PROJECT_VERSION@";
 inline constexpr std::string_view help_hint =
     "Try '@PROJECT_NAME@ --help' for more information.";
+// POSIX specifies TAB as the default field delimiter for cut.
+inline constexpr char default_field_delim = '\t';
 
 }  // namespace cc_cut::config
