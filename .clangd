@@ -13,6 +13,7 @@ CompileFlags:
     # C++23 project: ignore C++98 compatibility (included in -Weverything)
     - -Wno-c++98-compat
     - -Wno-c++98-compat-pedantic
+    - -Wno-switch-default
     # from_chars requires raw pointer arithmetic; the stdlib API cannot be changed
     - -Wno-unsafe-buffer-usage
     # Use Homebrew LLVM libc++
