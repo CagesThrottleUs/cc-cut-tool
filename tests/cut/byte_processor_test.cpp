@@ -110,3 +110,67 @@ TEST(SelectBytesTest, EmptyLineReturnsEmpty) {
 TEST(SelectBytesTest, AllBytesSelected) {
   EXPECT_EQ(ByteProcessor::select_bytes("abc", make_list({0, 1, 2})), "abc");
 }
+
+// ---------------------------------------------------------------------------
+// REQ-003: select_bytes_no_split — UTF-8-boundary-aware selection
+// ---------------------------------------------------------------------------
+
+// spec_id: SPEC-6  validates_req: REQ-003  tc: TC-REQ003-01
+TEST(SelectBytesNoSplitTest, PureAsciiMatchesSelectBytes) {
+  const auto list = make_list({0, 1, 4});
+  EXPECT_EQ(ByteProcessor::select_bytes_no_split("hello", list),
+            ByteProcessor::select_bytes("hello", list));
+}
+
+// spec_id: SPEC-6  validates_req: REQ-003  tc: TC-REQ003-02
+TEST(SelectBytesNoSplitTest, TwoByteCharLeadSelected) {
+  // "\xC3\xA9" = é; lead at byte 0 → full char included
+  EXPECT_EQ(ByteProcessor::select_bytes_no_split("\xC3\xA9", make_list({0})),
+            "\xC3\xA9");
+}
+
+// spec_id: SPEC-6  validates_req: REQ-003  tc: TC-REQ003-03
+TEST(SelectBytesNoSplitTest, TwoByteCharLeadNotSelected) {
+  // "\xC3\xA9" = é; lead at byte 0 not in {1} → char excluded
+  EXPECT_EQ(ByteProcessor::select_bytes_no_split("\xC3\xA9", make_list({1})),
+            "");
+}
+
+// spec_id: SPEC-6  validates_req: REQ-003  tc: TC-REQ003-04
+TEST(SelectBytesNoSplitTest, ThreeByteCharIncluded) {
+  // "\xE2\x82\xAC" = €; lead at byte 0 selected → full 3-byte char
+  EXPECT_EQ(
+      ByteProcessor::select_bytes_no_split("\xE2\x82\xAC", make_list({0})),
+      "\xE2\x82\xAC");
+}
+
+// spec_id: SPEC-6  validates_req: REQ-003  tc: TC-REQ003-05
+TEST(SelectBytesNoSplitTest, InvalidLeadByteIncludedAs1Byte) {
+  // "\x80" is an invalid lead (continuation byte); treated as 1-byte char
+  EXPECT_EQ(ByteProcessor::select_bytes_no_split("\x80", make_list({0})),
+            "\x80");
+}
+
+// spec_id: SPEC-6  validates_req: REQ-003  tc: TC-REQ003-06
+TEST(SelectBytesNoSplitTest, InvalidLeadByteExcluded) {
+  cc_cut::CutList empty;
+  EXPECT_EQ(ByteProcessor::select_bytes_no_split("\x80", empty), "");
+}
+
+// spec_id: SPEC-6  validates_req: REQ-003  tc: TC-REQ003-07
+TEST(SelectBytesNoSplitTest, MixedSelectByLeads) {
+  // "a\xC3\xA9b" = {0x61, 0xC3, 0xA9, 0x62} — 3 chars: 'a'(0), 'é'(1), 'b'(3)
+  // Leads at 0 and 1 selected → "a" + "é"
+  EXPECT_EQ(
+      ByteProcessor::select_bytes_no_split("a\xC3\xA9""b", make_list({0, 1})),
+      "a\xC3\xA9");
+}
+
+// spec_id: SPEC-6  validates_req: REQ-003  tc: TC-REQ003-08
+TEST(SelectBytesNoSplitTest, ContinuationByteInListDoesNotIncludeChar) {
+  // "a\xC3\xA9b": byte 2 is continuation of 'é' whose lead at 1 is not in {0,2}
+  // → only 'a' (lead at 0) is included
+  EXPECT_EQ(
+      ByteProcessor::select_bytes_no_split("a\xC3\xA9""b", make_list({0, 2})),
+      "a");
+}

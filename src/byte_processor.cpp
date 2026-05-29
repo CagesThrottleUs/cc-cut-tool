@@ -2,6 +2,7 @@
 #include "cut/byte_processor.hpp"
 
 #include <cstddef>
+#include <iterator>
 #include <limits>
 #include <ostream>
 #include <string>
@@ -11,6 +12,7 @@
 
 #include "cut/list.hpp"
 #include "cut/options.hpp"
+#include "utf8/core.h"
 
 namespace cc_cut {
 
@@ -32,9 +34,34 @@ auto ByteProcessor::select_bytes(std::string_view line, const CutList& list)
 
 auto ByteProcessor::select_bytes_no_split(std::string_view line,
                                           const CutList& list) -> std::string {
-  (void)line;
-  (void)list;
-  return {};
+  std::string result;
+  const int open_start =
+      list.open_from.value_or(std::numeric_limits<int>::max());
+
+  // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+  const auto* const base = reinterpret_cast<const utf8::utfchar8_t*>(line.data());
+  const auto* const end_ptr = std::next(base, static_cast<std::ptrdiff_t>(line.size()));
+
+  // NOLINTNEXTLINE(readability-qualified-auto)
+  auto cur = base;
+  while (cur != end_ptr) {
+    const auto* const seq_start = cur;
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+    const int start_pos = static_cast<int>(seq_start - base);
+
+    const auto err = utf8::internal::validate_next(cur, end_ptr);
+    if (err != utf8::internal::UTF8_OK) {
+      cur = std::next(seq_start);  // ASM-002: treat invalid byte as 1-byte char
+    }
+
+    if (list.indices.contains(start_pos) || start_pos >= open_start) {
+      // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+      result.append(reinterpret_cast<const char*>(seq_start),
+                    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+                    reinterpret_cast<const char*>(cur));
+    }
+  }
+  return result;
 }
 
 // NOLINTNEXTLINE(readability-convert-member-functions-to-static)
