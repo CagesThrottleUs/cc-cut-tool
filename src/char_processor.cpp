@@ -28,8 +28,9 @@ auto CharProcessor::select_chars(std::string_view line, const CutList& list)
     -> std::string {
   std::string result;
 
-  const auto* const base = reinterpret_cast<const utf8::utfchar8_t*>(
-      line.data());  // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
+  const auto* const base =
+      // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+      reinterpret_cast<const utf8::utfchar8_t*>(line.data());
   const auto* const end_ptr =
       std::next(base, static_cast<std::ptrdiff_t>(line.size()));
 
@@ -52,10 +53,10 @@ auto CharProcessor::select_chars(std::string_view line, const CutList& list)
         std::cmp_greater_equal(cp_idx, list.open_from.value());
     if (in_indices || in_open_range) {
       result.append(
-          reinterpret_cast<const char*>(
-              seq_start),  // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
-          reinterpret_cast<const char*>(
-              cur));  // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
+          // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+          reinterpret_cast<const char*>(seq_start),
+          // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+          reinterpret_cast<const char*>(cur));
     }
     ++cp_idx;
   }
