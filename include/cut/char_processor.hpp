@@ -3,7 +3,6 @@
 #include <iosfwd>
 #include <string>
 #include <string_view>
-#include <vector>
 
 #include "cut/list.hpp"
 #include "cut/options.hpp"
@@ -38,14 +37,9 @@ class CharProcessor : public Processor {
   // spec_id: SPEC-7  req_id: REQ-004
   /// Calls select_chars and writes result + '\n' to out.
   /// Always writes the newline, even for empty input.
-  void process_line(std::string_view line, std::ostream& out) const;
-
-  // spec_id: SPEC-7  req_id: REQ-005
-  /// Processes all files (or stdin when files is empty).
-  /// Continues past individual file errors; writes errors to err.
-  /// @returns 0 on full success, 1 if any file error occurred.
-  auto run(std::ostream& out, const std::vector<std::string>& files,
-           std::ostream& err) -> int override;
+  /// @note Public for direct unit-test access; called by Processor::run().
+  // NOLINTNEXTLINE(misc-override-with-different-visibility)
+  void process_line(std::string_view line, std::ostream& out) const override;
 
  private:
   CutOptions opts_;

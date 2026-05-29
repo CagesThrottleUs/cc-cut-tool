@@ -1,7 +1,6 @@
 // include/cut/field_processor.hpp
 #pragma once
 #include <iosfwd>
-#include <string>
 #include <string_view>
 #include <vector>
 
@@ -46,14 +45,9 @@ class FieldProcessor : public Processor {
   /// Processes one line: splits, selects, joins with delimiter, writes to out.
   /// If no delimiter found and suppress=true: writes nothing.
   /// If no delimiter found and suppress=false: writes line unchanged + newline.
-  void process_line(std::string_view line, std::ostream& out);
-
-  // spec_id: SPEC-5  req_id: REQ-006
-  /// Processes all files (or stdin if files is empty).
-  /// Continues past individual file errors; writes errors to err.
-  /// Returns 0 on full success, 1 if any file error occurred.
-  auto run(std::ostream& out, const std::vector<std::string>& files,
-           std::ostream& err) -> int override;
+  /// @note Public for direct unit-test access; called by Processor::run().
+  // NOLINTNEXTLINE(misc-override-with-different-visibility)
+  void process_line(std::string_view line, std::ostream& out) const override;
 
  private:
   CutOptions opts_;
