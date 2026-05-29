@@ -1,4 +1,5 @@
 #pragma once
+#include <cstddef>
 #include <optional>
 #include <set>
 
@@ -14,8 +15,8 @@ namespace cc_cut {
 ///   that index to end-of-line are implicitly selected in addition to
 ///   any positions in `indices` below it.
 ///
-/// @invariant All values in `indices` are >= 0.
-/// @invariant If `open_from` has a value, it is >= 0.
+/// @invariant All values in `indices` are non-negative (enforced by type).
+/// @invariant If `open_from` has a value, it is a valid 0-based index.
 ///
 /// @code
 ///   cc_cut::CutList list;
@@ -23,8 +24,9 @@ namespace cc_cut {
 ///   list.open_from = 4;     // also select position 4 to end-of-line
 /// @endcode
 struct CutList {
-  std::set<int> indices;  ///< 0-based positions to select (finite portion).
-  std::optional<int>
+  std::set<std::size_t>
+      indices;  ///< 0-based positions to select (finite portion).
+  std::optional<std::size_t>
       open_from;  ///< If set, select from this 0-based index to EOL.
 };
 
