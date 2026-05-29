@@ -157,9 +157,9 @@ TEST(ProcessLineTest, SelectFirstCpWritesWithNewline) {
   opts.mode = cc_cut::CutMode::CHARACTER;
   opts.list = make_list({0});
   CharProcessor proc{opts};
-  std::ostringstream ss;
-  proc.process_line("hello", ss);
-  EXPECT_EQ(ss.str(), "h\n");
+  std::ostringstream oss;
+  proc.process_line("hello", oss);
+  EXPECT_EQ(oss.str(), "h\n");
 }
 
 // spec_id: SPEC-7  validates_req: REQ-004  tc: TC-REQ004-02
@@ -168,7 +168,7 @@ TEST(ProcessLineTest, EmptyLineWritesJustNewline) {
   opts.mode = cc_cut::CutMode::CHARACTER;
   opts.list = make_list({0});
   CharProcessor proc{opts};
-  std::ostringstream ss;
-  proc.process_line("", ss);
-  EXPECT_EQ(ss.str(), "\n");
+  std::ostringstream oss;
+  proc.process_line("", oss);
+  EXPECT_EQ(oss.str(), "\n");
 }
