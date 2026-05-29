@@ -1,6 +1,7 @@
 // tests/cut/byte_processor_test.cpp
 // spec_id: SPEC-6  validates_req: REQ-001,REQ-002,REQ-003,REQ-004,REQ-005,REQ-006
 #include "cut/byte_processor.hpp"
+#include "cut/field_processor.hpp"
 
 #include <gtest/gtest.h>
 
@@ -52,6 +53,10 @@ static_assert(!std::is_abstract_v<ByteProcessor>,
 // spec_id: SPEC-6  validates_req: REQ-006  tc: TC-REQ006-07
 static_assert(std::is_base_of_v<Processor, ByteProcessor>,
               "TC-REQ006-07: ByteProcessor is_base_of Processor");
+
+// spec_id: SPEC-6  validates_req: REQ-006  tc: TC-REQ006-06
+static_assert(std::is_base_of_v<Processor, cc_cut::FieldProcessor>,
+              "TC-REQ006-06: FieldProcessor is_base_of Processor");
 
 // spec_id: SPEC-6  validates_req: REQ-001  tc: TC-REQ001-01
 TEST(ByteProcessorTest, ConstructsFromCutOptions) {
@@ -297,4 +302,38 @@ TEST(ByteProcessorRunTest, EmptyFileListReadsStdin) {
 
   EXPECT_EQ(ret, 0);
   EXPECT_EQ(out.str(), "h\n");
+}
+
+// ---------------------------------------------------------------------------
+// REQ-006: make_processor factory
+// ---------------------------------------------------------------------------
+
+// spec_id: SPEC-6  validates_req: REQ-006  tc: TC-REQ006-03
+TEST(MakeProcessorTest, ByteModeReturnsNonNullByteProcessor) {
+  cc_cut::CutOptions opts;
+  opts.mode = cc_cut::CutMode::BYTE;
+  auto result = cc_cut::make_processor(opts);
+  ASSERT_TRUE(result.has_value());
+  ASSERT_NE(result->get(), nullptr);
+  EXPECT_NE(dynamic_cast<ByteProcessor*>(result->get()), nullptr);
+}
+
+// spec_id: SPEC-6  validates_req: REQ-006  tc: TC-REQ006-04
+TEST(MakeProcessorTest, FieldModeReturnsNonNullFieldProcessor) {
+  cc_cut::CutOptions opts;
+  opts.mode = cc_cut::CutMode::FIELD;
+  auto result = cc_cut::make_processor(opts);
+  ASSERT_TRUE(result.has_value());
+  ASSERT_NE(result->get(), nullptr);
+  EXPECT_NE(dynamic_cast<cc_cut::FieldProcessor*>(result->get()), nullptr);
+}
+
+// spec_id: SPEC-6  validates_req: REQ-006  tc: TC-REQ006-05
+TEST(MakeProcessorTest, CharacterModeReturnsError) {
+  cc_cut::CutOptions opts;
+  opts.mode = cc_cut::CutMode::CHARACTER;
+  auto result = cc_cut::make_processor(opts);
+  ASSERT_FALSE(result.has_value());
+  EXPECT_EQ(result.error(),
+            "cc-cut-tool: character mode not yet implemented");
 }
