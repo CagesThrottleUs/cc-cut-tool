@@ -146,3 +146,29 @@ TEST(SelectCharsInvalidUtf8Test, TruncatedSequenceAtEol) {
   // "\xC3" alone = truncated 2-byte lead; treated as 1 codepoint at index 0
   EXPECT_EQ(CharProcessor::select_chars("\xC3", make_list({0})), "\xC3");
 }
+
+// ---------------------------------------------------------------------------
+// REQ-004: process_line writes selected codepoints + newline
+// ---------------------------------------------------------------------------
+
+// spec_id: SPEC-7  validates_req: REQ-004  tc: TC-REQ004-01
+TEST(ProcessLineTest, SelectFirstCpWritesWithNewline) {
+  cc_cut::CutOptions opts;
+  opts.mode = cc_cut::CutMode::CHARACTER;
+  opts.list = make_list({0});
+  CharProcessor proc{opts};
+  std::ostringstream ss;
+  proc.process_line("hello", ss);
+  EXPECT_EQ(ss.str(), "h\n");
+}
+
+// spec_id: SPEC-7  validates_req: REQ-004  tc: TC-REQ004-02
+TEST(ProcessLineTest, EmptyLineWritesJustNewline) {
+  cc_cut::CutOptions opts;
+  opts.mode = cc_cut::CutMode::CHARACTER;
+  opts.list = make_list({0});
+  CharProcessor proc{opts};
+  std::ostringstream ss;
+  proc.process_line("", ss);
+  EXPECT_EQ(ss.str(), "\n");
+}
