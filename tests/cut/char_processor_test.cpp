@@ -12,6 +12,7 @@
 #include <set>
 #include <sstream>
 #include <string>
+#include <type_traits>
 
 using cc_cut::CharProcessor;
 
@@ -30,3 +31,24 @@ auto make_open_list(int from) -> cc_cut::CutList {
 }
 
 }  // namespace
+
+// ---------------------------------------------------------------------------
+// REQ-001: CharProcessor class structure
+// ---------------------------------------------------------------------------
+
+// spec_id: SPEC-7  validates_req: REQ-001  tc: TC-REQ001-01
+static_assert(!std::is_abstract_v<cc_cut::CharProcessor>,
+              "CharProcessor must be concrete");
+
+// spec_id: SPEC-7  validates_req: REQ-001  tc: TC-REQ001-02
+static_assert(std::is_base_of_v<cc_cut::Processor, cc_cut::CharProcessor>,
+              "CharProcessor must inherit Processor");
+
+// spec_id: SPEC-7  validates_req: REQ-001  tc: TC-REQ001-03
+static_assert(std::is_abstract_v<cc_cut::Processor>,
+              "Processor base must remain abstract");
+
+TEST(CharProcessorStructureTest, StaticAssertsCompile) {
+  // static_asserts above enforce class structure at compile time.
+  SUCCEED();
+}
