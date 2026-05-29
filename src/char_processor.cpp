@@ -24,12 +24,12 @@ namespace cc_cut {
 CharProcessor::CharProcessor(CutOptions opts) : opts_(std::move(opts)) {}
 
 // spec_id: SPEC-7  req_id: REQ-002,REQ-003
-auto CharProcessor::select_chars(std::string_view line,
-                                 const CutList& list) -> std::string {
+auto CharProcessor::select_chars(std::string_view line, const CutList& list)
+    -> std::string {
   std::string result;
 
-  // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
-  const auto* const base = reinterpret_cast<const utf8::utfchar8_t*>(line.data());
+  const auto* const base = reinterpret_cast<const utf8::utfchar8_t*>(
+      line.data());  // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
   const auto* const end_ptr =
       std::next(base, static_cast<std::ptrdiff_t>(line.size()));
 
@@ -51,10 +51,11 @@ auto CharProcessor::select_chars(std::string_view line,
         list.open_from.has_value() &&
         std::cmp_greater_equal(cp_idx, list.open_from.value());
     if (in_indices || in_open_range) {
-      // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
-      result.append(reinterpret_cast<const char*>(seq_start),
-                    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
-                    reinterpret_cast<const char*>(cur));
+      result.append(
+          reinterpret_cast<const char*>(
+              seq_start),  // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
+          reinterpret_cast<const char*>(
+              cur));  // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
     }
     ++cp_idx;
   }
@@ -62,12 +63,14 @@ auto CharProcessor::select_chars(std::string_view line,
 }
 
 // spec_id: SPEC-7  req_id: REQ-004
-void CharProcessor::process_line(std::string_view line, std::ostream& out) const {
+void CharProcessor::process_line(std::string_view line,
+                                 std::ostream& out) const {
   out << select_chars(line, opts_.list) << '\n';
 }
 
 // spec_id: SPEC-7  req_id: REQ-005
-auto CharProcessor::run(std::ostream& out, const std::vector<std::string>& files,
+auto CharProcessor::run(std::ostream& out,
+                        const std::vector<std::string>& files,
                         std::ostream& err) -> int {
   int exit_code = 0;
 

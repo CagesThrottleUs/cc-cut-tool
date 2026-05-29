@@ -83,7 +83,8 @@ auto parse_delim(std::string_view arg, const std::span<char*>& args, int& idx)
   return delim_str.front();
 }
 
-// Parses mode + list from a mode flag. idx must already point past the mode arg.
+// Parses mode + list from a mode flag. idx must already point past the mode
+// arg.
 auto parse_mode_and_list(std::string_view arg, int argc, char** argv, int& idx)
     -> std::expected<std::pair<CutMode, CutList>, std::string> {
   auto mode_result = detect_mode(arg);
@@ -96,7 +97,8 @@ auto parse_mode_and_list(std::string_view arg, int argc, char** argv, int& idx)
   }
   auto list_result = parse_list(*spec_result);
   if (!list_result) {
-    return std::unexpected(translate_list_error(list_result.error(), *mode_result));
+    return std::unexpected(
+        translate_list_error(list_result.error(), *mode_result));
   }
   return std::make_pair(*mode_result, *list_result);
 }
@@ -108,18 +110,20 @@ auto check_help(const std::span<char*>& args) -> bool {
 }
 
 auto is_mode_flag(std::string_view arg) -> bool {
-  return arg.starts_with("-b") || arg.starts_with("-c") || arg.starts_with("-f");
+  return arg.starts_with("-b") || arg.starts_with("-c") ||
+         arg.starts_with("-f");
 }
 
 auto is_unknown_flag(std::string_view arg) -> bool {
   return arg.size() >= 2 && arg.front() == '-';
 }
 
-auto add_file(std::string_view file_path,
-              std::unordered_set<std::string>& seen,
+auto add_file(std::string_view file_path, std::unordered_set<std::string>& seen,
               std::vector<std::string>& files) -> void {
   std::string path{file_path};
-  if (seen.insert(path).second) { files.push_back(std::move(path)); }
+  if (seen.insert(path).second) {
+    files.push_back(std::move(path));
+  }
 }
 
 auto validate_final(const CutOptions& opts, bool mode_set)
@@ -129,9 +133,9 @@ auto validate_final(const CutOptions& opts, bool mode_set)
         "you must specify a list of bytes, characters, or fields"));
   }
   if (opts.suppress && opts.mode != CutMode::FIELD) {
-    return std::unexpected(format_error(
-        "suppressing non-delimited lines makes sense\n"
-        "\tonly when operating on fields"));
+    return std::unexpected(
+        format_error("suppressing non-delimited lines makes sense\n"
+                     "\tonly when operating on fields"));
   }
   return {};
 }
@@ -241,8 +245,8 @@ auto parse_args(int argc, char** argv)
   }
 
   if (args.size() < 2) {
-    return std::unexpected(
-        format_error("you must specify a list of bytes, characters, or fields"));
+    return std::unexpected(format_error(
+        "you must specify a list of bytes, characters, or fields"));
   }
 
   ParseResult result;
@@ -256,25 +260,45 @@ auto parse_args(int argc, char** argv)
     const std::string_view arg{
         args.subspan(static_cast<std::size_t>(idx)).front()};
 
-    if (arg == "--") { stop_flags = true; ++idx; continue; }
-    if (stop_flags)  { add_file(arg, seen, raw_files); ++idx; continue; }
+    if (arg == "--") {
+      stop_flags = true;
+      ++idx;
+      continue;
+    }
+    if (stop_flags) {
+      add_file(arg, seen, raw_files);
+      ++idx;
+      continue;
+    }
 
     if (is_mode_flag(arg)) {
       ++idx;
       auto mode_list = parse_mode_and_list(arg, argc, argv, idx);
-      if (!mode_list) { return std::unexpected(mode_list.error()); }
+      if (!mode_list) {
+        return std::unexpected(mode_list.error());
+      }
       result.opts.mode = mode_list->first;
       result.opts.list = mode_list->second;
       mode_set = true;
       continue;
     }
 
-    if (arg == "-n") { result.opts.no_split = true;  ++idx; continue; }
-    if (arg == "-s") { result.opts.suppress = true;   ++idx; continue; }
+    if (arg == "-n") {
+      result.opts.no_split = true;
+      ++idx;
+      continue;
+    }
+    if (arg == "-s") {
+      result.opts.suppress = true;
+      ++idx;
+      continue;
+    }
 
     if (arg.starts_with("-d")) {
       auto delim = parse_delim(arg, args, idx);
-      if (!delim) { return std::unexpected(delim.error()); }
+      if (!delim) {
+        return std::unexpected(delim.error());
+      }
       result.opts.delim = *delim;
       continue;
     }

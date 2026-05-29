@@ -4,6 +4,8 @@
 #include <gtest/gtest.h>
 
 #include <memory>
+#include <optional>
+#include <string_view>
 #include <type_traits>
 
 // spec_id: SPEC-2  validates_req: REQ-011
@@ -27,7 +29,7 @@ class StubFileSource : public FileSource {
 
 // spec_id: SPEC-1  validates_req: REQ-004  tc: TC-REQ004-02
 TEST(FileSourceTest, ConcreteSubclassInstantiable) {
-  StubFileSource stub;
+  const StubFileSource stub;
   (void)stub;
 }
 

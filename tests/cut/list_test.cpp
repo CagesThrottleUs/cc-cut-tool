@@ -3,6 +3,8 @@
 
 #include <gtest/gtest.h>
 
+#include <optional>
+
 // spec_id: SPEC-2  validates_req: REQ-011
 using cc_cut::CutList;
 
@@ -18,7 +20,7 @@ TEST(CutListTest, SetOpenFrom) {
   CutList list;
   list.open_from = 2;
   EXPECT_TRUE(list.open_from.has_value());
-  EXPECT_EQ(list.open_from.value(), 2);
+  EXPECT_EQ(*list.open_from, 2);
 }
 
 // spec_id: SPEC-1  validates_req: REQ-002  tc: TC-REQ002-03

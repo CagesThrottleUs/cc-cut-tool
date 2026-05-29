@@ -6,9 +6,12 @@
 
 #include <set>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "cut/config.hpp"
+#include "cut/mode.hpp"
+#include "cut/options.hpp"
 #include "cut/parse_result.hpp"
 
 using cc_cut::collect_files;
@@ -205,7 +208,7 @@ TEST(ParseModePropertiesTest, FieldDelimSeparate) {
   auto result = parse_mode_properties(sub.argc(), sub.argv(), index, opts);
   ASSERT_TRUE(result.has_value());
   ASSERT_TRUE(opts.delim.has_value());
-  EXPECT_EQ(*opts.delim, ',');
+  EXPECT_EQ(*opts.delim, ',');  // NOLINT(bugprone-unchecked-optional-access)
   EXPECT_EQ(index, 3);
 }
 
@@ -218,7 +221,7 @@ TEST(ParseModePropertiesTest, FieldDelimAttached) {
   auto result = parse_mode_properties(sub.argc(), sub.argv(), index, opts);
   ASSERT_TRUE(result.has_value());
   ASSERT_TRUE(opts.delim.has_value());
-  EXPECT_EQ(*opts.delim, ',');
+  EXPECT_EQ(*opts.delim, ',');  // NOLINT(bugprone-unchecked-optional-access)
   EXPECT_EQ(index, 2);
 }
 
@@ -255,7 +258,7 @@ TEST(ParseModePropertiesTest, FieldDelimAndSuppress) {
   auto result = parse_mode_properties(sub.argc(), sub.argv(), index, opts);
   ASSERT_TRUE(result.has_value());
   ASSERT_TRUE(opts.delim.has_value());
-  EXPECT_EQ(*opts.delim, ',');
+  EXPECT_EQ(*opts.delim, ',');  // NOLINT(bugprone-unchecked-optional-access)
   EXPECT_TRUE(opts.suppress);
   EXPECT_EQ(index, 4);
 }
@@ -304,8 +307,8 @@ TEST(CollectFilesTest, TwoDistinctFiles) {
   ArgvHolder holder{{"cut", "-f1", "a.txt", "b.txt"}};
   auto files = collect_files(holder.argc(), holder.argv(), 2);
   ASSERT_EQ(files.size(), 2U);
-  EXPECT_EQ(files[0], "a.txt");
-  EXPECT_EQ(files[1], "b.txt");
+  EXPECT_EQ(files.at(0), "a.txt");
+  EXPECT_EQ(files.at(1), "b.txt");
 }
 
 // spec_id: SPEC-3  validates_req: REQ-007  tc: TC-REQ007-02
@@ -313,9 +316,9 @@ TEST(CollectFilesTest, RemovesDuplicatePaths) {
   ArgvHolder holder{{"cut", "-f1", "a.txt", "-", "b.txt", "-", "a.txt"}};
   auto files = collect_files(holder.argc(), holder.argv(), 2);
   ASSERT_EQ(files.size(), 3U);
-  EXPECT_EQ(files[0], "a.txt");
-  EXPECT_EQ(files[1], "-");
-  EXPECT_EQ(files[2], "b.txt");
+  EXPECT_EQ(files.at(0), "a.txt");
+  EXPECT_EQ(files.at(1), "-");
+  EXPECT_EQ(files.at(2), "b.txt");
 }
 
 // spec_id: SPEC-3  validates_req: REQ-007  tc: TC-REQ007-03
@@ -330,7 +333,7 @@ TEST(CollectFilesTest, StdinDeduplicated) {
   ArgvHolder holder{{"cut", "-f1", "-", "-"}};
   auto files = collect_files(holder.argc(), holder.argv(), 2);
   ASSERT_EQ(files.size(), 1U);
-  EXPECT_EQ(files[0], "-");
+  EXPECT_EQ(files.at(0), "-");
 }
 
 // ---------------------------------------------------------------------------
@@ -364,8 +367,8 @@ TEST(ParseArgsTest, FilesCollected) {
   auto result = parse_args(holder.argc(), holder.argv());
   ASSERT_TRUE(result.has_value());
   ASSERT_EQ(result->files.size(), 2U);
-  EXPECT_EQ(result->files[0], "a.txt");
-  EXPECT_EQ(result->files[1], "b.txt");
+  EXPECT_EQ(result->files.at(0), "a.txt");
+  EXPECT_EQ(result->files.at(1), "b.txt");
 }
 
 // ---------------------------------------------------------------------------

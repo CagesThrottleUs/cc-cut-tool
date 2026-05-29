@@ -40,7 +40,8 @@ class Processor {
 // spec_id: SPEC-6  req_id: REQ-006
 // spec_id: SPEC-7  req_id: REQ-006
 /// Factory that returns a Processor for the mode specified in opts.
-/// @param opts Parsed CLI options; opts.mode determines which processor is created.
+/// @param opts Parsed CLI options; opts.mode determines which processor is
+/// created.
 /// @returns ByteProcessor for BYTE mode, FieldProcessor for FIELD mode,
 ///          CharProcessor for CHARACTER mode.
 auto make_processor(const CutOptions& opts)

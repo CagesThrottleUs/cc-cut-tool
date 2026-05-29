@@ -5,6 +5,7 @@
 #include <string_view>
 #include <vector>
 
+#include "cut/mode.hpp"
 #include "cut/options.hpp"
 #include "cut/parse_result.hpp"
 

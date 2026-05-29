@@ -50,10 +50,11 @@ auto ByteProcessor::select_bytes_no_split(std::string_view line,
       list.open_from.has_value()
           ? static_cast<std::size_t>(list.open_from.value())
           : std::numeric_limits<std::size_t>::max();
-
-  // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
-  const auto* const base = reinterpret_cast<const utf8::utfchar8_t*>(line.data());
-  const auto* const end_ptr = std::next(base, static_cast<std::ptrdiff_t>(line.size()));
+  const auto* const base =
+      // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+      reinterpret_cast<const utf8::utfchar8_t*>(line.data());
+  const auto* const end_ptr =
+      std::next(base, static_cast<std::ptrdiff_t>(line.size()));
 
   // NOLINTNEXTLINE(readability-qualified-auto)
   auto cur = base;
@@ -68,20 +69,23 @@ auto ByteProcessor::select_bytes_no_split(std::string_view line,
     }
 
     const bool in_indices =
-        (start_pos <= static_cast<std::size_t>(std::numeric_limits<int>::max())) &&
+        (start_pos <=
+         static_cast<std::size_t>(std::numeric_limits<int>::max())) &&
         list.indices.contains(static_cast<int>(start_pos));
     if (in_indices || start_pos >= open_start_sz) {
-      // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
-      result.append(reinterpret_cast<const char*>(seq_start),
-                    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
-                    reinterpret_cast<const char*>(cur));
+      result.append(
+          // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+          reinterpret_cast<const char*>(seq_start),
+          // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+          reinterpret_cast<const char*>(cur));
     }
   }
   return result;
 }
 
 // spec_id: SPEC-6  req_id: REQ-004
-void ByteProcessor::process_line(std::string_view line, std::ostream& out) const {
+void ByteProcessor::process_line(std::string_view line,
+                                 std::ostream& out) const {
   if (opts_.no_split) {
     out << select_bytes_no_split(line, opts_.list) << '\n';
   } else {
@@ -90,7 +94,8 @@ void ByteProcessor::process_line(std::string_view line, std::ostream& out) const
 }
 
 // spec_id: SPEC-6  req_id: REQ-005
-auto ByteProcessor::run(std::ostream& out, const std::vector<std::string>& files,
+auto ByteProcessor::run(std::ostream& out,
+                        const std::vector<std::string>& files,
                         std::ostream& err) -> int {
   int exit_code = 0;
 

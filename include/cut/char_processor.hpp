@@ -27,10 +27,13 @@ class CharProcessor : public Processor {
   // spec_id: SPEC-7  req_id: REQ-002,REQ-003
   /// Selects codepoints from line by 0-based codepoint index according to list.
   /// Invalid UTF-8 bytes are treated as single codepoints (ASM-003).
-  /// @param line  Input line (may contain arbitrary bytes including invalid UTF-8).
-  /// @param list  Codepoint positions to select; open_from selects from that index to EOL.
+  /// @param line  Input line (may contain arbitrary bytes including invalid
+  /// UTF-8).
+  /// @param list  Codepoint positions to select; open_from selects from that
+  /// index to EOL.
   /// @returns Owned string of selected codepoints' UTF-8 bytes, in order.
-  static auto select_chars(std::string_view line, const CutList& list) -> std::string;
+  static auto select_chars(std::string_view line, const CutList& list)
+      -> std::string;
 
   // spec_id: SPEC-7  req_id: REQ-004
   /// Calls select_chars and writes result + '\n' to out.

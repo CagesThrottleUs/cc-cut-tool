@@ -19,7 +19,8 @@ namespace cc_cut {
 /// std::ostream references.
 ///
 /// @note opts.no_split controls UTF-8 boundary awareness (-n flag):
-///       false → select_bytes (raw); true → select_bytes_no_split (UTF-8 aware).
+///       false → select_bytes (raw); true → select_bytes_no_split (UTF-8
+///       aware).
 class ByteProcessor : public Processor {
  public:
   explicit ByteProcessor(CutOptions opts);
@@ -27,8 +28,10 @@ class ByteProcessor : public Processor {
   // spec_id: SPEC-6  req_id: REQ-002
   /// Selects raw bytes from line by 0-based position according to list.
   /// Out-of-bounds positions are silently skipped.
-  /// @param line Input line (may contain arbitrary bytes including invalid UTF-8).
-  /// @param list Byte positions to select; open_from selects from that position to EOL.
+  /// @param line Input line (may contain arbitrary bytes including invalid
+  /// UTF-8).
+  /// @param list Byte positions to select; open_from selects from that position
+  /// to EOL.
   /// @returns Owned string of selected bytes in order.
   static auto select_bytes(std::string_view line, const CutList& list)
       -> std::string;

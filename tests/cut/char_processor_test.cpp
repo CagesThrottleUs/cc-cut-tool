@@ -1,18 +1,22 @@
 // tests/cut/char_processor_test.cpp
 // spec_id: SPEC-7
 #include "cut/char_processor.hpp"
-#include "cut/mode.hpp"
-#include "cut/processor.hpp"
 
 #include <gtest/gtest.h>
 
 #include <filesystem>
 #include <fstream>
+#include <initializer_list>
 #include <iostream>
 #include <set>
 #include <sstream>
 #include <string>
 #include <type_traits>
+
+#include "cut/list.hpp"
+#include "cut/mode.hpp"
+#include "cut/options.hpp"
+#include "cut/processor.hpp"
 
 using cc_cut::CharProcessor;
 
@@ -76,8 +80,10 @@ TEST(SelectCharsTest, OpenRange) {
 TEST(SelectCharsTest, OpenRangeWithMultibyte) {
   // "h\xC3\xA9llo": h=cp0, é=cp1, l=cp2, l=cp3, o=cp4
   // open_from=2 → codepoints 2,3,4 → "llo"
-  // A byte-counting bug would emit "llo" from byte offset 2 (inside é), producing garbage
-  EXPECT_EQ(CharProcessor::select_chars("h\xC3\xA9llo", make_open_list(2)), "llo");
+  // A byte-counting bug would emit "llo" from byte offset 2 (inside é),
+  // producing garbage
+  EXPECT_EQ(CharProcessor::select_chars("h\xC3\xA9llo", make_open_list(2)),
+            "llo");
 }
 
 // spec_id: SPEC-7  validates_req: REQ-002  tc: TC-REQ002-04
@@ -93,7 +99,8 @@ TEST(SelectCharsTest, EmptyLineReturnsEmpty) {
 // spec_id: SPEC-7  validates_req: REQ-002  tc: TC-REQ002-06
 TEST(SelectCharsTest, TwoByteCodepointSelected) {
   // "\xC3\xA9" = é (U+00E9): lead at codepoint 0 → full 2 bytes emitted
-  EXPECT_EQ(CharProcessor::select_chars("\xC3\xA9", make_list({0})), "\xC3\xA9");
+  EXPECT_EQ(CharProcessor::select_chars("\xC3\xA9", make_list({0})),
+            "\xC3\xA9");
 }
 
 // spec_id: SPEC-7  validates_req: REQ-002  tc: TC-REQ002-07
@@ -120,7 +127,8 @@ TEST(SelectCharsTest, MultibyteAtCpIndex1) {
 // spec_id: SPEC-7  validates_req: REQ-002  tc: TC-REQ002-10
 TEST(SelectCharsTest, MultibyteExcludedFromResult) {
   // select {0,2}: h(0) and l(2); é(1) excluded → "hl"
-  EXPECT_EQ(CharProcessor::select_chars("h\xC3\xA9llo", make_list({0, 2})), "hl");
+  EXPECT_EQ(CharProcessor::select_chars("h\xC3\xA9llo", make_list({0, 2})),
+            "hl");
 }
 
 // spec_id: SPEC-7  validates_req: REQ-002  tc: TC-REQ002-11
@@ -197,7 +205,7 @@ TEST(RunTest, EmptyFilesReadsStdin) {
   opts.mode = cc_cut::CutMode::CHARACTER;
   opts.list = make_list({0});
   CharProcessor proc{opts};
-  std::istringstream fake_stdin{"ab\n"};
+  const std::istringstream fake_stdin{"ab\n"};
   auto* const old_buf = std::cin.rdbuf(fake_stdin.rdbuf());
   std::ostringstream out;
   std::ostringstream err;
@@ -236,7 +244,9 @@ TEST(RunTest, ErrorMessageContainsPath) {
 TEST(RunTest, ContinuesAfterMissingFile) {
   const auto tmp =
       std::filesystem::temp_directory_path() / "sp07_continue_test.tmp";
-  { std::ofstream{tmp} << "ab\n"; }
+  {
+    std::ofstream{tmp} << "ab\n";
+  }
 
   cc_cut::CutOptions opts;
   opts.mode = cc_cut::CutMode::CHARACTER;
@@ -244,7 +254,8 @@ TEST(RunTest, ContinuesAfterMissingFile) {
   CharProcessor proc{opts};
   std::ostringstream out;
   std::ostringstream err;
-  const int ret = proc.run(out, {"/no/such/sp07_missing.txt", tmp.string()}, err);
+  const int ret =
+      proc.run(out, {"/no/such/sp07_missing.txt", tmp.string()}, err);
   std::filesystem::remove(tmp);
   EXPECT_EQ(ret, 1);
   EXPECT_EQ(out.str(), "a\n");

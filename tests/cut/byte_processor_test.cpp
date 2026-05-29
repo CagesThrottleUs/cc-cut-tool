@@ -1,13 +1,15 @@
 // tests/cut/byte_processor_test.cpp
-// spec_id: SPEC-6  validates_req: REQ-001,REQ-002,REQ-003,REQ-004,REQ-005,REQ-006
+// spec_id: SPEC-6  validates_req:
+// REQ-001,REQ-002,REQ-003,REQ-004,REQ-005,REQ-006
 #include "cut/byte_processor.hpp"
-#include "cut/field_processor.hpp"
 
 #include <gtest/gtest.h>
 
 #include <cstddef>
 #include <filesystem>
 #include <fstream>
+#include <initializer_list>
+#include <iostream>
 #include <optional>
 #include <set>
 #include <sstream>
@@ -16,7 +18,9 @@
 #include <type_traits>
 #include <vector>
 
+#include "cut/field_processor.hpp"
 #include "cut/list.hpp"
+#include "cut/mode.hpp"
 #include "cut/options.hpp"
 #include "cut/processor.hpp"
 
@@ -39,8 +43,9 @@ static_assert(std::is_abstract_v<cc_cut::Processor>,
 // ---------------------------------------------------------------------------
 
 // spec_id: SPEC-6  validates_req: REQ-001  tc: TC-REQ001-02
-static_assert(std::is_constructible_v<ByteProcessor, CutOptions>,
-              "TC-REQ001-02: ByteProcessor must be constructible from CutOptions");
+static_assert(
+    std::is_constructible_v<ByteProcessor, CutOptions>,
+    "TC-REQ001-02: ByteProcessor must be constructible from CutOptions");
 
 // spec_id: SPEC-6  validates_req: REQ-001  tc: TC-REQ001-03
 static_assert(std::is_base_of_v<Processor, ByteProcessor>,
@@ -158,7 +163,7 @@ TEST(SelectBytesNoSplitTest, InvalidLeadByteIncludedAs1Byte) {
 
 // spec_id: SPEC-6  validates_req: REQ-003  tc: TC-REQ003-06
 TEST(SelectBytesNoSplitTest, InvalidLeadByteExcluded) {
-  cc_cut::CutList empty;
+  const cc_cut::CutList empty;
   EXPECT_EQ(ByteProcessor::select_bytes_no_split("\x80", empty), "");
 }
 
@@ -166,29 +171,33 @@ TEST(SelectBytesNoSplitTest, InvalidLeadByteExcluded) {
 TEST(SelectBytesNoSplitTest, MixedSelectByLeads) {
   // "a\xC3\xA9b" = {0x61, 0xC3, 0xA9, 0x62} — 3 chars: 'a'(0), 'é'(1), 'b'(3)
   // Leads at 0 and 1 selected → "a" + "é"
-  EXPECT_EQ(
-      ByteProcessor::select_bytes_no_split("a\xC3\xA9""b", make_list({0, 1})),
-      "a\xC3\xA9");
+  EXPECT_EQ(ByteProcessor::select_bytes_no_split("a\xC3\xA9"
+                                                 "b",
+                                                 make_list({0, 1})),
+            "a\xC3\xA9");
 }
 
 // spec_id: SPEC-6  validates_req: REQ-003  tc: TC-REQ003-08
 TEST(SelectBytesNoSplitTest, ContinuationByteInListDoesNotIncludeChar) {
   // "a\xC3\xA9b": byte 2 is continuation of 'é' whose lead at 1 is not in {0,2}
   // → only 'a' (lead at 0) is included
-  EXPECT_EQ(
-      ByteProcessor::select_bytes_no_split("a\xC3\xA9""b", make_list({0, 2})),
-      "a");
+  EXPECT_EQ(ByteProcessor::select_bytes_no_split("a\xC3\xA9"
+                                                 "b",
+                                                 make_list({0, 2})),
+            "a");
 }
 
 // spec_id: SPEC-6  validates_req: REQ-003  tc: TC-REQ003-09
 TEST(SelectBytesNoSplitTest, TruncatedSequenceIncludedAs1Byte) {
-  // "\xC3" alone is a truncated 2-byte sequence; treated as 1-byte char per ASM-002
-  EXPECT_EQ(ByteProcessor::select_bytes_no_split("\xC3", make_list({0})), "\xC3");
+  // "\xC3" alone is a truncated 2-byte sequence; treated as 1-byte char per
+  // ASM-002
+  EXPECT_EQ(ByteProcessor::select_bytes_no_split("\xC3", make_list({0})),
+            "\xC3");
 }
 
 // spec_id: SPEC-6  validates_req: REQ-003  tc: TC-REQ003-10
 TEST(SelectBytesNoSplitTest, TruncatedSequenceExcluded) {
-  cc_cut::CutList empty;
+  const cc_cut::CutList empty;
   EXPECT_EQ(ByteProcessor::select_bytes_no_split("\xC3", empty), "");
 }
 
@@ -198,8 +207,8 @@ TEST(SelectBytesNoSplitTest, TruncatedSequenceExcluded) {
 
 namespace {
 
-auto make_opts(std::initializer_list<int> idxs,
-               bool no_split = false) -> cc_cut::CutOptions {
+auto make_opts(std::initializer_list<int> idxs, bool no_split = false)
+    -> cc_cut::CutOptions {
   cc_cut::CutOptions opts;
   opts.mode = cc_cut::CutMode::BYTE;
   opts.list = make_list(idxs);
@@ -226,14 +235,16 @@ TEST(ProcessLineTest, NonContiguousBytesNoSplit) {
 // spec_id: SPEC-6  validates_req: REQ-004  tc: TC-REQ004-03
 TEST(ProcessLineTest, MultibyteCharNoSplitEnabled) {
   std::ostringstream out;
-  ByteProcessor{make_opts({0}, /*no_split=*/true)}.process_line("\xC3\xA9", out);
+  ByteProcessor{make_opts({0}, /*no_split=*/true)}.process_line("\xC3\xA9",
+                                                                out);
   EXPECT_EQ(out.str(), "\xC3\xA9\n");
 }
 
 // spec_id: SPEC-6  validates_req: REQ-004  tc: TC-REQ004-04
 TEST(ProcessLineTest, MultibyteCharLeadNotSelectedNoSplitEnabled) {
   std::ostringstream out;
-  ByteProcessor{make_opts({1}, /*no_split=*/true)}.process_line("\xC3\xA9", out);
+  ByteProcessor{make_opts({1}, /*no_split=*/true)}.process_line("\xC3\xA9",
+                                                                out);
   EXPECT_EQ(out.str(), "\n");
 }
 
@@ -304,7 +315,7 @@ TEST(ByteProcessorRunTest, FirstValidSecondMissingContinues) {
 
 // spec_id: SPEC-6  validates_req: REQ-005  tc: TC-REQ005-04
 TEST(ByteProcessorRunTest, EmptyFileListReadsStdin) {
-  std::istringstream fake_stdin("hello\n");
+  const std::istringstream fake_stdin("hello\n");
   auto* old_buf = std::cin.rdbuf(fake_stdin.rdbuf());
 
   std::ostringstream out;

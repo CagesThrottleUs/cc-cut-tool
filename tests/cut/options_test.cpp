@@ -3,6 +3,10 @@
 
 #include <gtest/gtest.h>
 
+#include <optional>
+
+#include "cut/mode.hpp"
+
 // spec_id: SPEC-2  validates_req: REQ-011
 using cc_cut::CutMode;
 using cc_cut::CutOptions;
@@ -21,7 +25,7 @@ TEST(CutOptionsTest, SetDelim) {
   CutOptions opts;
   opts.delim = ',';
   EXPECT_TRUE(opts.delim.has_value());
-  EXPECT_EQ(opts.delim.value(), ',');
+  EXPECT_EQ(*opts.delim, ',');
 }
 
 // spec_id: SPEC-1  validates_req: REQ-003  tc: TC-REQ003-03

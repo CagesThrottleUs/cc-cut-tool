@@ -32,11 +32,11 @@ inline constexpr std::size_t mmap_threshold = 100ULL * 1024ULL * 1024ULL;
 /// @endcode
 class FileSource {
  public:
-  FileSource()                                     = default;
-  FileSource(const FileSource&)                    = delete;
+  FileSource() = default;
+  FileSource(const FileSource&) = delete;
   auto operator=(const FileSource&) -> FileSource& = delete;
-  FileSource(FileSource&&)                         = delete;
-  auto operator=(FileSource&&)      -> FileSource& = delete;
+  FileSource(FileSource&&) = delete;
+  auto operator=(FileSource&&) -> FileSource& = delete;
 
   // spec_id: SPEC-1  req_id: REQ-004
   /// Reads the entire input into an internal buffer.
@@ -65,9 +65,9 @@ class FileSource {
 
  protected:
   // spec_id: SPEC-4  req_id: REQ-002
-  /// Returns [cursor, next-newline) without the newline. Advances cursor past it.
-  /// Returns nullopt when cursor >= buffer.size().
-  /// CR before LF is included — no CRLF normalization.
+  /// Returns [cursor, next-newline) without the newline. Advances cursor past
+  /// it. Returns nullopt when cursor >= buffer.size(). CR before LF is included
+  /// — no CRLF normalization.
   static auto next_line(std::string_view buffer, std::size_t& cursor)
       -> std::optional<std::string_view> {
     if (cursor >= buffer.size()) {

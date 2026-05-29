@@ -1,25 +1,30 @@
-// spec_id: SPEC-4  validates_req: REQ-001,REQ-002,REQ-003,REQ-004,REQ-005,REQ-006,REQ-007
+// spec_id: SPEC-4  validates_req:
+// REQ-001,REQ-002,REQ-003,REQ-004,REQ-005,REQ-006,REQ-007
+#include <gtest/gtest.h>
+
+#include <cstddef>
+#include <filesystem>
+#include <fstream>
+#include <ios>
+#include <iostream>
+#include <optional>
+#include <sstream>
+#include <string>
+#include <string_view>
+#include <type_traits>
+
 #include "cut/buffered_file_source.hpp"
 #include "cut/file_source.hpp"
 #include "cut/make_file_source.hpp"
 #include "cut/mmap_file_source.hpp"
 #include "cut/stdin_source.hpp"
 
-#include <gtest/gtest.h>
-
-#include <cstddef>
-#include <filesystem>
-#include <fstream>
-#include <sstream>
-#include <string>
-#include <type_traits>
-
 using cc_cut::BufferedFileSource;
 using cc_cut::FileSource;
-using cc_cut::MmapFileSource;
-using cc_cut::StdinSource;
 using cc_cut::make_file_source;
 using cc_cut::mmap_threshold;
+using cc_cut::MmapFileSource;
+using cc_cut::StdinSource;
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -27,8 +32,7 @@ using cc_cut::mmap_threshold;
 namespace {
 
 auto make_temp_file(const std::string& content) -> std::filesystem::path {
-  const auto path =
-      std::filesystem::temp_directory_path() / "sp04_test.tmp";
+  const auto path = std::filesystem::temp_directory_path() / "sp04_test.tmp";
   std::ofstream ofs{path};
   ofs << content;
   return path;
@@ -69,7 +73,7 @@ TEST(NextLineTest, BasicSplit) {
   std::size_t cur = 0;
   auto result = NextLineTester::test_next_line("a\nb\n", cur);
   ASSERT_TRUE(result.has_value());
-  EXPECT_EQ(*result, "a");
+  EXPECT_EQ(*result, "a");  // NOLINT(bugprone-unchecked-optional-access)
   EXPECT_EQ(cur, 2U);
 }
 
@@ -78,7 +82,7 @@ TEST(NextLineTest, SecondLine) {
   std::size_t cur = 2;
   auto result = NextLineTester::test_next_line("a\nb\n", cur);
   ASSERT_TRUE(result.has_value());
-  EXPECT_EQ(*result, "b");
+  EXPECT_EQ(*result, "b");  // NOLINT(bugprone-unchecked-optional-access)
   EXPECT_EQ(cur, 4U);
 }
 
@@ -93,7 +97,7 @@ TEST(NextLineTest, NoTrailingNewline) {
   std::size_t cur = 2;
   auto result = NextLineTester::test_next_line("a\nb", cur);
   ASSERT_TRUE(result.has_value());
-  EXPECT_EQ(*result, "b");
+  EXPECT_EQ(*result, "b");  // NOLINT(bugprone-unchecked-optional-access)
   EXPECT_EQ(cur, 3U);
 }
 
@@ -102,7 +106,7 @@ TEST(NextLineTest, CrlfIncluded) {
   std::size_t cur = 0;
   auto result = NextLineTester::test_next_line("a\r\nb", cur);
   ASSERT_TRUE(result.has_value());
-  EXPECT_EQ(*result, "a\r");
+  EXPECT_EQ(*result, "a\r");  // NOLINT(bugprone-unchecked-optional-access)
   EXPECT_EQ(cur, 3U);
 }
 
@@ -117,7 +121,7 @@ TEST(NextLineTest, BlankLine) {
   std::size_t cur = 0;
   auto result = NextLineTester::test_next_line("\n", cur);
   ASSERT_TRUE(result.has_value());
-  EXPECT_EQ(*result, "");
+  EXPECT_EQ(*result, "");  // NOLINT(bugprone-unchecked-optional-access)
   EXPECT_EQ(cur, 1U);
 }
 
@@ -127,7 +131,7 @@ TEST(NextLineTest, BlankLine) {
 
 // spec_id: SPEC-4  validates_req: REQ-003  tc: TC-REQ003-01
 TEST(StdinSourceTest, TwoLinesWithTrailingNewline) {
-  std::istringstream input_ss{"line1\nline2\n"};
+  const std::istringstream input_ss{"line1\nline2\n"};
   auto* const old_buf = std::cin.rdbuf(input_ss.rdbuf());
   StdinSource src;
   src.load();
@@ -139,7 +143,7 @@ TEST(StdinSourceTest, TwoLinesWithTrailingNewline) {
 
 // spec_id: SPEC-4  validates_req: REQ-003  tc: TC-REQ003-02
 TEST(StdinSourceTest, NoTrailingNewline) {
-  std::istringstream input_ss{"line1\nline2"};
+  const std::istringstream input_ss{"line1\nline2"};
   auto* const old_buf = std::cin.rdbuf(input_ss.rdbuf());
   StdinSource src;
   src.load();
@@ -151,7 +155,7 @@ TEST(StdinSourceTest, NoTrailingNewline) {
 
 // spec_id: SPEC-4  validates_req: REQ-003  tc: TC-REQ003-03
 TEST(StdinSourceTest, EmptyStdin) {
-  std::istringstream input_ss{""};
+  const std::istringstream input_ss{""};
   auto* const old_buf = std::cin.rdbuf(input_ss.rdbuf());
   StdinSource src;
   src.load();
@@ -161,7 +165,7 @@ TEST(StdinSourceTest, EmptyStdin) {
 
 // spec_id: SPEC-4  validates_req: REQ-003  tc: TC-REQ003-04
 TEST(StdinSourceTest, CrlfPreserved) {
-  std::istringstream input_ss{"a\r\nb"};
+  const std::istringstream input_ss{"a\r\nb"};
   auto* const old_buf = std::cin.rdbuf(input_ss.rdbuf());
   StdinSource src;
   src.load();
@@ -283,7 +287,7 @@ TEST(MakeFileSourceTest, NonExistentReturnsError) {
 
 // spec_id: SPEC-4  validates_req: REQ-006  tc: TC-REQ006-04
 TEST(MakeFileSourceTest, FactoryDoesNotCallLoad) {
-  std::istringstream input_ss{"hello\n"};
+  const std::istringstream input_ss{"hello\n"};
   auto* const old_buf = std::cin.rdbuf(input_ss.rdbuf());
   auto result = make_file_source("-");
   ASSERT_TRUE(result.has_value());
