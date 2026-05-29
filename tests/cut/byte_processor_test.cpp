@@ -174,3 +174,57 @@ TEST(SelectBytesNoSplitTest, ContinuationByteInListDoesNotIncludeChar) {
       ByteProcessor::select_bytes_no_split("a\xC3\xA9""b", make_list({0, 2})),
       "a");
 }
+
+// ---------------------------------------------------------------------------
+// REQ-004: process_line
+// ---------------------------------------------------------------------------
+
+namespace {
+
+auto make_opts(std::initializer_list<int> idxs,
+               bool no_split = false) -> cc_cut::CutOptions {
+  cc_cut::CutOptions opts;
+  opts.mode = cc_cut::CutMode::BYTE;
+  opts.list = make_list(idxs);
+  opts.no_split = no_split;
+  return opts;
+}
+
+}  // namespace
+
+// spec_id: SPEC-6  validates_req: REQ-004  tc: TC-REQ004-01
+TEST(ProcessLineTest, SingleByteNoSplit) {
+  std::ostringstream out;
+  ByteProcessor{make_opts({0})}.process_line("hello", out);
+  EXPECT_EQ(out.str(), "h\n");
+}
+
+// spec_id: SPEC-6  validates_req: REQ-004  tc: TC-REQ004-02
+TEST(ProcessLineTest, NonContiguousBytesNoSplit) {
+  std::ostringstream out;
+  ByteProcessor{make_opts({0, 1, 4})}.process_line("hello", out);
+  EXPECT_EQ(out.str(), "heo\n");
+}
+
+// spec_id: SPEC-6  validates_req: REQ-004  tc: TC-REQ004-03
+TEST(ProcessLineTest, MultibyteCharNoSplitEnabled) {
+  std::ostringstream out;
+  ByteProcessor{make_opts({0}, /*no_split=*/true)}.process_line("\xC3\xA9", out);
+  EXPECT_EQ(out.str(), "\xC3\xA9\n");
+}
+
+// spec_id: SPEC-6  validates_req: REQ-004  tc: TC-REQ004-04
+TEST(ProcessLineTest, MultibyteCharLeadNotSelectedNoSplitEnabled) {
+  std::ostringstream out;
+  ByteProcessor{make_opts({1}, /*no_split=*/true)}.process_line("\xC3\xA9", out);
+  EXPECT_EQ(out.str(), "\n");
+}
+
+// spec_id: SPEC-6  validates_req: REQ-004  tc: TC-REQ004-05
+TEST(ProcessLineTest, EmptyLineProducesNewline) {
+  std::ostringstream out;
+  cc_cut::CutOptions opts;
+  opts.mode = cc_cut::CutMode::BYTE;
+  ByteProcessor{opts}.process_line("", out);
+  EXPECT_EQ(out.str(), "\n");
+}

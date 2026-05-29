@@ -64,10 +64,12 @@ auto ByteProcessor::select_bytes_no_split(std::string_view line,
   return result;
 }
 
-// NOLINTNEXTLINE(readability-convert-member-functions-to-static)
-void ByteProcessor::process_line(std::string_view line, std::ostream& out) {
-  (void)line;
-  (void)out;
+void ByteProcessor::process_line(std::string_view line, std::ostream& out) const {
+  if (opts_.no_split) {
+    out << select_bytes_no_split(line, opts_.list) << '\n';
+  } else {
+    out << select_bytes(line, opts_.list) << '\n';
+  }
 }
 
 auto ByteProcessor::run(std::ostream& out, const std::vector<std::string>& files,

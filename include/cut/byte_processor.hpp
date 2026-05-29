@@ -25,7 +25,7 @@ class ByteProcessor : public Processor {
       -> std::string;
 
   // spec_id: SPEC-6  req_id: REQ-004
-  void process_line(std::string_view line, std::ostream& out);
+  void process_line(std::string_view line, std::ostream& out) const;
 
   // spec_id: SPEC-6  req_id: REQ-005
   auto run(std::ostream& out, const std::vector<std::string>& files,
