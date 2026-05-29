@@ -140,6 +140,9 @@ auto apply_token(std::string_view token, CutList& cutlist)
 
   if (right.empty()) {
     std::size_t open = *left_num - 1;  // safe: left_num >= 1
+    if (open > list_max_position) {
+      return std::unexpected(std::format("field value out of range: {}", token));
+    }
     if (!cutlist.open_from.has_value() || open < *cutlist.open_from) {
       cutlist.open_from = open;
     }
