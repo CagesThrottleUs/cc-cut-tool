@@ -3,7 +3,6 @@
 #include <iosfwd>
 #include <string>
 #include <string_view>
-#include <vector>
 
 #include "cut/list.hpp"
 #include "cut/options.hpp"
@@ -50,17 +49,9 @@ class ByteProcessor : public Processor {
   /// Selects bytes from line and writes result + newline to out.
   /// Uses select_bytes_no_split if opts_.no_split, else select_bytes.
   /// Always writes at least a newline, even for empty input.
-  void process_line(std::string_view line, std::ostream& out) const;
-
-  // spec_id: SPEC-6  req_id: REQ-005
-  /// Processes all files (or stdin if files is empty).
-  /// Continues past individual file errors; writes errors to err.
-  /// @param out Output stream for selected bytes.
-  /// @param files Paths to process; empty → reads from stdin.
-  /// @param err Error stream for diagnostics.
-  /// @returns 0 on full success, 1 if any file error occurred.
-  auto run(std::ostream& out, const std::vector<std::string>& files,
-           std::ostream& err) -> int override;
+  /// @note Public for direct unit-test access; called by Processor::run().
+  // NOLINTNEXTLINE(misc-override-with-different-visibility)
+  void process_line(std::string_view line, std::ostream& out) const override;
 
  private:
   CutOptions opts_;

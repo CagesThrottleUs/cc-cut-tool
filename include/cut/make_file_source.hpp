@@ -22,7 +22,7 @@ namespace cc_cut {
 /// @param path  File path or "-" for stdin.
 /// @return      FileSource on success; error string on failure.
 /// @throws      Never throws.
-auto make_file_source(std::string_view path)
+[[nodiscard]] auto make_file_source(std::string_view path)
     -> std::expected<std::unique_ptr<FileSource>, std::string>;
 
 }  // namespace cc_cut

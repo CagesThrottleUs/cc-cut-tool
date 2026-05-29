@@ -4,6 +4,7 @@
 
 #include <gtest/gtest.h>
 
+#include <cstddef>
 #include <filesystem>
 #include <fstream>
 #include <initializer_list>
@@ -22,13 +23,13 @@ using cc_cut::CharProcessor;
 
 namespace {
 
-auto make_list(std::initializer_list<int> idxs) -> cc_cut::CutList {
+auto make_list(std::initializer_list<std::size_t> idxs) -> cc_cut::CutList {
   cc_cut::CutList list;
-  list.indices = std::set<int>{idxs};
+  list.indices = std::set<std::size_t>{idxs};
   return list;
 }
 
-auto make_open_list(int from) -> cc_cut::CutList {
+auto make_open_list(std::size_t from) -> cc_cut::CutList {
   cc_cut::CutList list;
   list.open_from = from;
   return list;
@@ -236,7 +237,8 @@ TEST(RunTest, ErrorMessageContainsPath) {
   CharProcessor proc{opts};
   std::ostringstream out;
   std::ostringstream err;
-  proc.run(out, {"/no/such/sp07_path_check.txt"}, err);
+  const int ret = proc.run(out, {"/no/such/sp07_path_check.txt"}, err);
+  EXPECT_EQ(ret, 1);
   EXPECT_NE(err.str().find("/no/such/sp07_path_check.txt"), std::string::npos);
 }
 

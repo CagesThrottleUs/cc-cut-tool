@@ -3,18 +3,14 @@
 
 #include <algorithm>
 #include <cstddef>
-#include <ios>
+#include <limits>
 #include <ostream>
-#include <set>
-#include <span>
-#include <string>
 #include <string_view>
 #include <utility>
 #include <vector>
 
 #include "cut/config.hpp"
 #include "cut/list.hpp"
-#include "cut/make_file_source.hpp"
 #include "cut/options.hpp"
 
 namespace cc_cut {
@@ -64,34 +60,32 @@ auto FieldProcessor::select_fields(const std::vector<std::string_view>& fields,
     return {};
   }
 
-  int max_pos = -1;
-  if (!list.indices.empty()) {
-    max_pos = *list.indices.rbegin();
-  }
-  if (list.open_from.has_value()) {
-    max_pos = std::max(max_pos, static_cast<int>(fields.size()) - 1);
-  }
-  if (max_pos < 0) {
-    return {};
-  }
-
-  const int open_start = list.open_from.value_or(max_pos + 1);
-  const auto fspan = std::span<const std::string_view>{fields};
+  const std::size_t num_fields = fields.size();
+  const std::size_t open_start =
+      list.open_from.value_or(std::numeric_limits<std::size_t>::max());
+  const std::size_t indices_max =
+      list.indices.empty() ? 0 : *list.indices.rbegin();
+  const std::size_t max_pos =
+      list.open_from.has_value()
+          ? std::max(indices_max,
+                     num_fields > 0 ? num_fields - 1 : std::size_t{0})
+          : indices_max;
 
   std::vector<std::string_view> result;
-  for (int pos = 0; pos <= max_pos; ++pos) {
+  result.reserve(num_fields);
+  for (std::size_t pos = 0; pos <= max_pos; ++pos) {
     if (!list.indices.contains(pos) && pos < open_start) {
       continue;
     }
-    const auto idx = static_cast<std::size_t>(pos);
-    if (idx < fspan.size()) {
-      result.push_back(fspan.subspan(idx).front());
+    if (pos < num_fields) {
+      result.push_back(fields.at(pos));
     }
   }
   return result;
 }
 
-void FieldProcessor::process_line(std::string_view line, std::ostream& out) {
+void FieldProcessor::process_line(std::string_view line,
+                                  std::ostream& out) const {
   const bool has_delim =
       opts_.delim.has_value()
           ? line.contains(opts_.delim.value())
@@ -119,41 +113,6 @@ void FieldProcessor::process_line(std::string_view line, std::ostream& out) {
     first = false;
   }
   out << '\n';
-}
-
-auto FieldProcessor::run(std::ostream& out,
-                         const std::vector<std::string>& files,
-                         std::ostream& err) -> int {
-  int exit_code = 0;
-
-  const auto process_source = [&](const std::string& path) -> void {
-    auto source_result = make_file_source(path);
-    if (!source_result) {
-      err << source_result.error() << '\n';
-      exit_code = 1;
-      return;
-    }
-    try {
-      (*source_result)->load();
-    } catch (const std::ios_base::failure& ex) {
-      err << config::program_name << ": " << path << ": " << ex.what() << '\n';
-      exit_code = 1;
-      return;
-    }
-    while (auto line = (*source_result)->getline()) {
-      process_line(*line, out);
-    }
-  };
-
-  if (files.empty()) {
-    process_source("-");
-  } else {
-    for (const auto& path : files) {
-      process_source(path);
-    }
-  }
-
-  return exit_code;
 }
 
 }  // namespace cc_cut

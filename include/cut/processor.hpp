@@ -4,6 +4,7 @@
 #include <iosfwd>
 #include <memory>
 #include <string>
+#include <string_view>
 #include <vector>
 
 #include "cut/options.hpp"
@@ -13,9 +14,9 @@ namespace cc_cut {
 // spec_id: SPEC-6  req_id: REQ-006
 /// Abstract base for all cut mode processors.
 ///
-/// Subclasses implement run() for a specific CutMode (BYTE, FIELD, CHARACTER).
+/// Subclasses implement process_line() for a specific CutMode.
 /// Copy and move are deleted — processors are consumed only via unique_ptr.
-/// The run() method may be called more than once on the same instance.
+/// run() drives the file loop and delegates each line to process_line().
 class Processor {
  public:
   Processor() = default;
@@ -31,10 +32,14 @@ class Processor {
   /// @param files Paths to process; "-" or empty → reads from stdin.
   /// @param err Error stream for diagnostics.
   /// @returns 0 on full success, 1 if any file error occurred.
-  /// @note string_view lines returned by FileSource::getline() alias the
-  ///       source's internal buffer and are valid only within the loop body.
-  virtual auto run(std::ostream& out, const std::vector<std::string>& files,
-                   std::ostream& err) -> int = 0;
+  [[nodiscard]] auto run(std::ostream& out,
+                         const std::vector<std::string>& files,
+                         std::ostream& err) -> int;
+
+ protected:
+  /// Selects and writes one line's output + newline to out.
+  /// Called by run() for every input line.
+  virtual void process_line(std::string_view line, std::ostream& out) const = 0;
 };
 
 // spec_id: SPEC-6  req_id: REQ-006
@@ -44,7 +49,7 @@ class Processor {
 /// created.
 /// @returns ByteProcessor for BYTE mode, FieldProcessor for FIELD mode,
 ///          CharProcessor for CHARACTER mode.
-auto make_processor(const CutOptions& opts)
+[[nodiscard]] auto make_processor(const CutOptions& opts)
     -> std::expected<std::unique_ptr<Processor>, std::string>;
 
 }  // namespace cc_cut

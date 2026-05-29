@@ -1,6 +1,7 @@
 #include "cut/list_parser.hpp"
 
 #include <charconv>
+#include <cstddef>
 #include <expected>
 #include <format>
 #include <optional>
@@ -15,13 +16,16 @@ namespace cc_cut {
 
 namespace {
 
-auto parse_pos_int(std::string_view str) -> std::optional<int> {
+// Maximum index value accepted in any range; guards against OOM from loops.
+constexpr std::size_t list_max_position = 1'000'000;
+
+auto parse_pos_int(std::string_view str) -> std::optional<std::size_t> {
   if (str.empty() || str.front() < '0' || str.front() > '9') {
     return std::nullopt;
   }
   // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
   const char* const str_end = str.data() + str.size();
-  int parsed = 0;
+  std::size_t parsed = 0;
   // NOLINTNEXTLINE(bugprone-suspicious-stringview-data-usage)
   const auto [ptr, ec] = std::from_chars(str.data(), str_end, parsed);
   if (ec != std::errc{} || ptr != str_end) {
@@ -74,6 +78,19 @@ auto tokenize(std::string_view list_arg) -> std::vector<std::string> {
   return tokens;
 }
 
+// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
+auto insert_bounded_range(std::size_t range_first, std::size_t range_last,
+                          std::string_view token, CutList& cutlist)
+    -> std::expected<void, std::string> {
+  if (range_last > list_max_position) {
+    return std::unexpected(std::format("field value out of range: {}", token));
+  }
+  for (std::size_t idx = range_first; idx < range_last; ++idx) {
+    cutlist.indices.insert(idx);
+  }
+  return {};
+}
+
 // Zero-position check precedes decreasing-range check per SPEC-2 REQ-005.
 auto apply_token(std::string_view token, CutList& cutlist)
     -> std::expected<void, std::string> {
@@ -107,10 +124,7 @@ auto apply_token(std::string_view token, CutList& cutlist)
     if (*end == 0) {
       return std::unexpected("values may not include zero");
     }
-    for (int idx = 0; idx < *end; ++idx) {
-      cutlist.indices.insert(idx);
-    }
-    return {};
+    return insert_bounded_range(0, *end, token, cutlist);
   }
 
   auto left = token.substr(0, dash);
@@ -125,7 +139,10 @@ auto apply_token(std::string_view token, CutList& cutlist)
   }
 
   if (right.empty()) {
-    int open = *left_num - 1;
+    std::size_t open = *left_num - 1;  // safe: left_num >= 1
+    if (open > list_max_position) {
+      return std::unexpected(std::format("field value out of range: {}", token));
+    }
     if (!cutlist.open_from.has_value() || open < *cutlist.open_from) {
       cutlist.open_from = open;
     }
@@ -142,10 +159,7 @@ auto apply_token(std::string_view token, CutList& cutlist)
   if (*left_num > *right_num) {
     return std::unexpected("invalid decreasing range");
   }
-  for (int idx = *left_num - 1; idx < *right_num; ++idx) {
-    cutlist.indices.insert(idx);
-  }
-  return {};
+  return insert_bounded_range(*left_num - 1, *right_num, token, cutlist);
 }
 
 }  // anonymous namespace

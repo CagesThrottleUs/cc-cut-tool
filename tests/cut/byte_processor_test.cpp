@@ -76,14 +76,14 @@ TEST(ByteProcessorTest, ConstructsFromCutOptions) {
 namespace {
 
 // Helper: build a CutList with only indices (no open_from)
-auto make_list(std::initializer_list<int> idxs) -> cc_cut::CutList {
+auto make_list(std::initializer_list<std::size_t> idxs) -> cc_cut::CutList {
   cc_cut::CutList list;
-  list.indices = std::set<int>{idxs};
+  list.indices = std::set<std::size_t>{idxs};
   return list;
 }
 
 // Helper: build a CutList with open_from only
-auto make_open_list(int from) -> cc_cut::CutList {
+auto make_open_list(std::size_t from) -> cc_cut::CutList {
   cc_cut::CutList list;
   list.open_from = from;
   return list;
@@ -207,7 +207,7 @@ TEST(SelectBytesNoSplitTest, TruncatedSequenceExcluded) {
 
 namespace {
 
-auto make_opts(std::initializer_list<int> idxs, bool no_split = false)
+auto make_opts(std::initializer_list<std::size_t> idxs, bool no_split = false)
     -> cc_cut::CutOptions {
   cc_cut::CutOptions opts;
   opts.mode = cc_cut::CutMode::BYTE;

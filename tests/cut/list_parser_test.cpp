@@ -4,6 +4,7 @@
 
 #include <gtest/gtest.h>
 
+#include <cstddef>
 #include <optional>
 #include <set>
 
@@ -19,7 +20,7 @@ using cc_cut::parse_list;
 TEST(ParseListTest, ReturnsValueForValidInput) {
   auto result = parse_list("1");
   ASSERT_TRUE(result.has_value());
-  EXPECT_EQ(result->indices, (std::set<int>{0}));
+  EXPECT_EQ(result->indices, (std::set<std::size_t>{0}));
 }
 
 // spec_id: SPEC-2  validates_req: REQ-001  tc: TC-REQ001-02
@@ -44,7 +45,7 @@ TEST(ParseListTest, PureFunctionIdenticalResults) {
 TEST(ParseListTest, CommaModeThreeTokens) {
   auto result = parse_list("1,3,5");
   ASSERT_TRUE(result.has_value());
-  EXPECT_EQ(result->indices, (std::set<int>{0, 2, 4}));
+  EXPECT_EQ(result->indices, (std::set<std::size_t>{0, 2, 4}));
   EXPECT_EQ(result->open_from, std::nullopt);
 }
 
@@ -52,7 +53,7 @@ TEST(ParseListTest, CommaModeThreeTokens) {
 TEST(ParseListTest, CommaModeWhitespaceStripped) {
   auto result = parse_list("1, 3, 5");
   ASSERT_TRUE(result.has_value());
-  EXPECT_EQ(result->indices, (std::set<int>{0, 2, 4}));
+  EXPECT_EQ(result->indices, (std::set<std::size_t>{0, 2, 4}));
 }
 
 // spec_id: SPEC-2  validates_req: REQ-002  tc: TC-REQ002-02
@@ -75,7 +76,7 @@ TEST(ParseListTest, CommaModeLeadingComma) {
 TEST(ParseListTest, WhitespaceModeSpaceSeparated) {
   auto result = parse_list("1 3 5");
   ASSERT_TRUE(result.has_value());
-  EXPECT_EQ(result->indices, (std::set<int>{0, 2, 4}));
+  EXPECT_EQ(result->indices, (std::set<std::size_t>{0, 2, 4}));
   EXPECT_EQ(result->open_from, std::nullopt);
 }
 
@@ -83,14 +84,14 @@ TEST(ParseListTest, WhitespaceModeSpaceSeparated) {
 TEST(ParseListTest, WhitespaceModeLeadingTrailingSpaces) {
   auto result = parse_list("  1  3  ");
   ASSERT_TRUE(result.has_value());
-  EXPECT_EQ(result->indices, (std::set<int>{0, 2}));
+  EXPECT_EQ(result->indices, (std::set<std::size_t>{0, 2}));
 }
 
 // spec_id: SPEC-2  validates_req: REQ-003  tc: TC-REQ003-03
 TEST(ParseListTest, WhitespaceModeTabSeparated) {
   auto result = parse_list("1\t3");
   ASSERT_TRUE(result.has_value());
-  EXPECT_EQ(result->indices, (std::set<int>{0, 2}));
+  EXPECT_EQ(result->indices, (std::set<std::size_t>{0, 2}));
 }
 
 // ---- REQ-004: plain number token ----
@@ -99,7 +100,7 @@ TEST(ParseListTest, WhitespaceModeTabSeparated) {
 TEST(ParseListTest, PlainNumberThree) {
   auto result = parse_list("3");
   ASSERT_TRUE(result.has_value());
-  EXPECT_EQ(result->indices, (std::set<int>{2}));
+  EXPECT_EQ(result->indices, (std::set<std::size_t>{2}));
   EXPECT_EQ(result->open_from, std::nullopt);
 }
 
@@ -107,7 +108,7 @@ TEST(ParseListTest, PlainNumberThree) {
 TEST(ParseListTest, PlainNumberOne) {
   auto result = parse_list("1");
   ASSERT_TRUE(result.has_value());
-  EXPECT_EQ(result->indices, (std::set<int>{0}));
+  EXPECT_EQ(result->indices, (std::set<std::size_t>{0}));
 }
 
 // spec_id: SPEC-2  validates_req: REQ-004  tc: TC-REQ004-03
@@ -115,7 +116,7 @@ TEST(ParseListTest, PlainNumberDuplicate) {
   auto result = parse_list("1 1");
   ASSERT_TRUE(result.has_value());
   EXPECT_EQ(result->indices.size(), 1U);
-  EXPECT_EQ(result->indices, (std::set<int>{0}));
+  EXPECT_EQ(result->indices, (std::set<std::size_t>{0}));
 }
 
 // ---- REQ-005: range token N-M ----
@@ -124,7 +125,7 @@ TEST(ParseListTest, PlainNumberDuplicate) {
 TEST(ParseListTest, RangeTwoToFive) {
   auto result = parse_list("2-5");
   ASSERT_TRUE(result.has_value());
-  EXPECT_EQ(result->indices, (std::set<int>{1, 2, 3, 4}));
+  EXPECT_EQ(result->indices, (std::set<std::size_t>{1, 2, 3, 4}));
   EXPECT_EQ(result->open_from, std::nullopt);
 }
 
@@ -132,7 +133,7 @@ TEST(ParseListTest, RangeTwoToFive) {
 TEST(ParseListTest, RangeSingleElement) {
   auto result = parse_list("3-3");
   ASSERT_TRUE(result.has_value());
-  EXPECT_EQ(result->indices, (std::set<int>{2}));
+  EXPECT_EQ(result->indices, (std::set<std::size_t>{2}));
 }
 
 // spec_id: SPEC-2  validates_req: REQ-005  tc: TC-REQ005-03
@@ -146,7 +147,7 @@ TEST(ParseListTest, RangeDecreasing) {
 TEST(ParseListTest, RangeCombined) {
   auto result = parse_list("1,3-5,7");
   ASSERT_TRUE(result.has_value());
-  EXPECT_EQ(result->indices, (std::set<int>{0, 2, 3, 4, 6}));
+  EXPECT_EQ(result->indices, (std::set<std::size_t>{0, 2, 3, 4, 6}));
   EXPECT_EQ(result->open_from, std::nullopt);
 }
 
@@ -163,7 +164,7 @@ TEST(ParseListTest, RangeZeroEndpoint) {
 TEST(ParseListTest, OpenStartDashFour) {
   auto result = parse_list("-4");
   ASSERT_TRUE(result.has_value());
-  EXPECT_EQ(result->indices, (std::set<int>{0, 1, 2, 3}));
+  EXPECT_EQ(result->indices, (std::set<std::size_t>{0, 1, 2, 3}));
   EXPECT_EQ(result->open_from, std::nullopt);
 }
 
@@ -171,7 +172,7 @@ TEST(ParseListTest, OpenStartDashFour) {
 TEST(ParseListTest, OpenStartDashOne) {
   auto result = parse_list("-1");
   ASSERT_TRUE(result.has_value());
-  EXPECT_EQ(result->indices, (std::set<int>{0}));
+  EXPECT_EQ(result->indices, (std::set<std::size_t>{0}));
 }
 
 // ---- REQ-007: open-end token N- ----
@@ -180,7 +181,7 @@ TEST(ParseListTest, OpenStartDashOne) {
 TEST(ParseListTest, OpenEndThreeDash) {
   auto result = parse_list("3-");
   ASSERT_TRUE(result.has_value());
-  EXPECT_EQ(result->open_from, 2);
+  EXPECT_EQ(result->open_from, std::size_t{2});
   EXPECT_TRUE(result->indices.empty());
 }
 
@@ -188,22 +189,22 @@ TEST(ParseListTest, OpenEndThreeDash) {
 TEST(ParseListTest, OpenEndOneDash) {
   auto result = parse_list("1-");
   ASSERT_TRUE(result.has_value());
-  EXPECT_EQ(result->open_from, 0);
+  EXPECT_EQ(result->open_from, std::size_t{0});
 }
 
 // spec_id: SPEC-2  validates_req: REQ-007  tc: TC-REQ007-03
 TEST(ParseListTest, OpenEndMultipleSelectsMinimum) {
   auto result = parse_list("3-,5-");
   ASSERT_TRUE(result.has_value());
-  EXPECT_EQ(result->open_from, 2);
+  EXPECT_EQ(result->open_from, std::size_t{2});
 }
 
 // spec_id: SPEC-2  validates_req: REQ-007  tc: TC-REQ007-04
 TEST(ParseListTest, OpenEndWithFiniteIndices) {
   auto result = parse_list("1,3-");
   ASSERT_TRUE(result.has_value());
-  EXPECT_EQ(result->indices, (std::set<int>{0}));
-  EXPECT_EQ(result->open_from, 2);
+  EXPECT_EQ(result->indices, (std::set<std::size_t>{0}));
+  EXPECT_EQ(result->open_from, std::size_t{2});
 }
 
 // ---- REQ-008: zero position error ----

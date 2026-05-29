@@ -1,4 +1,5 @@
 #pragma once
+#include <cstddef>
 #include <filesystem>
 #include <optional>
 #include <string>
@@ -11,11 +12,11 @@ namespace cc_cut {
 // spec_id: SPEC-4  req_id: REQ-004
 /// Reads a file entirely into memory on load().
 /// Throws std::ios_base::failure if the file cannot be opened or read.
-class BufferedFileSource : public FileSource {
+class BufferedFileSource final : public FileSource {
  public:
   explicit BufferedFileSource(std::filesystem::path path);
   void load() override;
-  auto getline() -> std::optional<std::string_view> override;
+  [[nodiscard]] auto getline() -> std::optional<std::string_view> override;
 
  private:
   std::filesystem::path path_;
