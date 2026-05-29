@@ -2,10 +2,9 @@
 #include <iostream>
 
 #include "cut/arg_parser.hpp"
-#include "cut/field_processor.hpp"
-#include "cut/mode.hpp"
+#include "cut/processor.hpp"
 
-// spec_id: SPEC-5  req_id: REQ-007
+// spec_id: SPEC-6  req_id: REQ-007
 auto main(int argc, char** argv) -> int {
   auto result = cc_cut::parse_args(argc, argv);
   if (!result) {
@@ -15,10 +14,10 @@ auto main(int argc, char** argv) -> int {
   if (result->help_requested) {
     return 0;
   }
-  if (result->opts.mode != cc_cut::CutMode::FIELD) {
-    std::cerr << "cc-cut-tool: byte and character modes not yet implemented\n";
+  auto proc = cc_cut::make_processor(result->opts);
+  if (!proc) {
+    std::cerr << proc.error() << '\n';
     return 1;
   }
-  return cc_cut::FieldProcessor{result->opts}.run(std::cout, result->files,
-                                                  std::cerr);
+  return (*proc)->run(std::cout, result->files, std::cerr);
 }
