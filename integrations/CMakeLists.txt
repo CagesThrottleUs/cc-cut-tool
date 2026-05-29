@@ -45,7 +45,27 @@ else()
 endif()
 
 # ---------------------------------------------------------------------------
-# 2.  Coreutils cut.pl test vectors
+# 2.  Byte-mode acceptance tests  (TC-REQ007)
+# ---------------------------------------------------------------------------
+
+if(BASH_EXECUTABLE)
+    add_test(
+        NAME    integ_byte_mode
+        COMMAND ${BASH_EXECUTABLE}
+                    ${INTEG_DIR}/test_byte_mode.sh
+                    $<TARGET_FILE:${CUT_TARGET}>
+    )
+    add_integration_test(integ_byte_mode)
+    set_tests_properties(integ_byte_mode PROPERTIES
+        LABELS "integration;byte_mode"
+    )
+else()
+    message(WARNING
+        "Integration: bash not found — integ_byte_mode will not be registered")
+endif()
+
+# ---------------------------------------------------------------------------
+# 3.  Coreutils cut.pl test vectors
 #     run_cut_tests.pl provides the test framework and filters out tests
 #     for unsupported features (--output-delimiter, -z, -F, --complement).
 # ---------------------------------------------------------------------------
@@ -68,7 +88,7 @@ else()
 endif()
 
 # ---------------------------------------------------------------------------
-# 3.  Coreutils shell test scripts
+# 4.  Coreutils shell test scripts
 #     These require the coreutils test infrastructure (tests/init.sh).
 #     run_shell_test.sh exits 77 (SKIP) when the infrastructure is absent.
 # ---------------------------------------------------------------------------
