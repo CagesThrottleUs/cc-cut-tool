@@ -235,3 +235,25 @@ TEST(RunTest, ContinuesAfterMissingFile) {
   EXPECT_EQ(ret, 1);
   EXPECT_EQ(out.str(), "a\n");
 }
+
+// ---------------------------------------------------------------------------
+// REQ-006: make_processor returns CharProcessor for CutMode::CHARACTER
+// ---------------------------------------------------------------------------
+
+// spec_id: SPEC-7  validates_req: REQ-006  tc: TC-REQ006-01
+TEST(MakeProcessorCharTest, CharacterModeReturnsValue) {
+  cc_cut::CutOptions opts;
+  opts.mode = cc_cut::CutMode::CHARACTER;
+  auto proc = cc_cut::make_processor(opts);
+  EXPECT_TRUE(proc.has_value());
+  EXPECT_NE(proc->get(), nullptr);
+}
+
+// spec_id: SPEC-7  validates_req: REQ-006  tc: TC-REQ006-02
+TEST(MakeProcessorCharTest, CharacterModeReturnsCharProcessor) {
+  cc_cut::CutOptions opts;
+  opts.mode = cc_cut::CutMode::CHARACTER;
+  auto proc = cc_cut::make_processor(opts);
+  ASSERT_TRUE(proc.has_value());
+  EXPECT_NE(dynamic_cast<cc_cut::CharProcessor*>(proc->get()), nullptr);
+}
