@@ -54,6 +54,7 @@ include/cut/          Type-definition headers
   file_source.hpp     FileSource abstract interface
   processor.hpp       Processor abstract base + make_processor factory
   byte_processor.hpp  ByteProcessor class (SP-06)
+  char_processor.hpp  CharProcessor class (SP-07)
   field_processor.hpp FieldProcessor class (SP-05)
 
 src/main.cpp          Entry point
@@ -76,6 +77,7 @@ sample/               Sample data files (TSV, CSV)
 - Boost.Iostreams linked in CMake (SP-04); used by MmapFileSource
 - `Processor` abstract base + `make_processor` factory (SP-06) — all mode dispatch goes through factory; main.cpp contains no CutMode comparisons
 - `utf8cpp` vendored at `include/utf8.h` — used by ByteProcessor for `-n` UTF-8 boundary detection; `utf8::internal::validate_next` is 2-arg; invalid bytes treated as 1-byte chars (ASM-002)
+- `CharProcessor::select_chars` counts codepoints via `cp_idx` counter (not byte offset) — list positions are codepoint indices, not byte positions; invalid bytes treated as 1-codepoint each (ASM-003)
 
 ## Sub-Project Status
 
@@ -87,5 +89,5 @@ sample/               Sample data files (TSV, CSV)
 | SP-04 File Interface | ✅ Complete |
 | SP-05 Field Mode | ✅ Complete |
 | SP-06 Byte Mode | ✅ Complete |
-| SP-07 Char Mode | Pending |
+| SP-07 Char Mode | ✅ Complete |
 | SP-08 Integration Pass | Pending |
