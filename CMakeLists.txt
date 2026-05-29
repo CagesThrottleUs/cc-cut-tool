@@ -25,6 +25,7 @@ set(SRC_FILES
   src/mmap_file_source.cpp
   src/make_file_source.cpp
   src/field_processor.cpp
+  src/processor.cpp
 )
 
 add_executable(${PROJECT_NAME} src/main.cpp ${SRC_FILES})
