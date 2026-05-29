@@ -1,4 +1,5 @@
 // src/processor.cpp
+// spec_id: SPEC-6
 #include "cut/processor.hpp"
 
 #include <expected>
@@ -12,6 +13,7 @@
 
 namespace cc_cut {
 
+// spec_id: SPEC-6  req_id: REQ-006
 auto make_processor(const CutOptions& opts)
     -> std::expected<std::unique_ptr<Processor>, std::string> {
   switch (opts.mode) {

@@ -1,4 +1,5 @@
 // src/byte_processor.cpp
+// spec_id: SPEC-6
 #include "cut/byte_processor.hpp"
 
 #include <cstddef>
@@ -19,27 +20,36 @@
 
 namespace cc_cut {
 
+// spec_id: SPEC-6  req_id: REQ-001
 ByteProcessor::ByteProcessor(CutOptions opts) : opts_(std::move(opts)) {}
 
+// spec_id: SPEC-6  req_id: REQ-002
 auto ByteProcessor::select_bytes(std::string_view line, const CutList& list)
     -> std::string {
   std::string result;
-  const auto size = static_cast<int>(line.size());
-  const int open_start =
-      list.open_from.value_or(std::numeric_limits<int>::max());
-  for (int pos = 0; pos < size; ++pos) {
-    if (list.indices.contains(pos) || pos >= open_start) {
-      result += line.at(static_cast<std::size_t>(pos));
+  const std::size_t open_start =
+      list.open_from.has_value()
+          ? static_cast<std::size_t>(list.open_from.value())
+          : std::numeric_limits<std::size_t>::max();
+  for (std::size_t pos = 0; pos < line.size(); ++pos) {
+    const bool in_indices =
+        (pos <= static_cast<std::size_t>(std::numeric_limits<int>::max())) &&
+        list.indices.contains(static_cast<int>(pos));
+    if (in_indices || pos >= open_start) {
+      result += line.at(pos);
     }
   }
   return result;
 }
 
+// spec_id: SPEC-6  req_id: REQ-003
 auto ByteProcessor::select_bytes_no_split(std::string_view line,
                                           const CutList& list) -> std::string {
   std::string result;
-  const int open_start =
-      list.open_from.value_or(std::numeric_limits<int>::max());
+  const std::size_t open_start_sz =
+      list.open_from.has_value()
+          ? static_cast<std::size_t>(list.open_from.value())
+          : std::numeric_limits<std::size_t>::max();
 
   // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
   const auto* const base = reinterpret_cast<const utf8::utfchar8_t*>(line.data());
@@ -50,14 +60,17 @@ auto ByteProcessor::select_bytes_no_split(std::string_view line,
   while (cur != end_ptr) {
     const auto* const seq_start = cur;
     // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
-    const int start_pos = static_cast<int>(seq_start - base);
+    const auto start_pos = static_cast<std::size_t>(seq_start - base);
 
     const auto err = utf8::internal::validate_next(cur, end_ptr);
     if (err != utf8::internal::UTF8_OK) {
       cur = std::next(seq_start);  // ASM-002: treat invalid byte as 1-byte char
     }
 
-    if (list.indices.contains(start_pos) || start_pos >= open_start) {
+    const bool in_indices =
+        (start_pos <= static_cast<std::size_t>(std::numeric_limits<int>::max())) &&
+        list.indices.contains(static_cast<int>(start_pos));
+    if (in_indices || start_pos >= open_start_sz) {
       // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
       result.append(reinterpret_cast<const char*>(seq_start),
                     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
@@ -67,6 +80,7 @@ auto ByteProcessor::select_bytes_no_split(std::string_view line,
   return result;
 }
 
+// spec_id: SPEC-6  req_id: REQ-004
 void ByteProcessor::process_line(std::string_view line, std::ostream& out) const {
   if (opts_.no_split) {
     out << select_bytes_no_split(line, opts_.list) << '\n';
@@ -75,6 +89,7 @@ void ByteProcessor::process_line(std::string_view line, std::ostream& out) const
   }
 }
 
+// spec_id: SPEC-6  req_id: REQ-005
 auto ByteProcessor::run(std::ostream& out, const std::vector<std::string>& files,
                         std::ostream& err) -> int {
   int exit_code = 0;
