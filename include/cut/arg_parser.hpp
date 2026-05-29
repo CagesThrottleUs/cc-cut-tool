@@ -27,7 +27,7 @@ namespace cc_cut {
 /// @return      ParseResult on success; error string on failure.
 ///              Error string format: "cc-cut-tool: <msg>\nTry '...'".
 /// @throws      Never throws.
-auto parse_args(int argc, char** argv)
+[[nodiscard]] auto parse_args(int argc, char** argv)
     -> std::expected<ParseResult, std::string>;
 
 // spec_id: SPEC-3  req_id: REQ-004
@@ -36,7 +36,8 @@ auto parse_args(int argc, char** argv)
 /// @param flag  The first argument (e.g. "-f", "-b3-5").
 /// @return      CutMode on "-b"/"-c"/"-f"; error on anything else.
 ///              Error format: "cc-cut-tool: invalid option -- '<c>'\n..."
-auto detect_mode(std::string_view flag) -> std::expected<CutMode, std::string>;
+[[nodiscard]] auto detect_mode(std::string_view flag)
+    -> std::expected<CutMode, std::string>;
 
 // spec_id: SPEC-3  req_id: REQ-005
 /// Extract the list specification string from argv.
@@ -51,7 +52,8 @@ auto detect_mode(std::string_view flag) -> std::expected<CutMode, std::string>;
 /// @param index  Position of first arg after the flag (starts at 2).
 /// @return       List spec string_view on success; error on missing arg.
 /// @pre          index >= 2 (flag has been consumed as argv[1]).
-auto extract_list_spec(std::string_view flag, int argc, char** argv, int& index)
+[[nodiscard]] auto extract_list_spec(std::string_view flag, int argc,
+                                     char** argv, int& index)
     -> std::expected<std::string_view, std::string>;
 
 // spec_id: SPEC-3  req_id: REQ-006
@@ -65,7 +67,8 @@ auto extract_list_spec(std::string_view flag, int argc, char** argv, int& index)
 /// @param index  Current parse position; modified in-place.
 /// @param opts   Options updated in-place.
 /// @return       void on success; error if a property value is invalid.
-auto parse_mode_properties(int argc, char** argv, int& index, CutOptions& opts)
+[[nodiscard]] auto parse_mode_properties(int argc, char** argv, int& index,
+                                         CutOptions& opts)
     -> std::expected<void, std::string>;
 
 // spec_id: SPEC-3  req_id: REQ-007

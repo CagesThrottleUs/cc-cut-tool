@@ -26,7 +26,7 @@ namespace cc_cut {
 ///   if (result) { use(*result); }
 ///   else        { std::cerr << result.error() << '\n'; }
 /// @endcode
-auto parse_list(std::string_view list_arg)
+[[nodiscard]] auto parse_list(std::string_view list_arg)
     -> std::expected<CutList, std::string>;
 
 }  // namespace cc_cut

@@ -59,7 +59,7 @@ class FileSource {
   ///          It is invalidated when load() is called again or when
   ///          the FileSource is destroyed. Storing it past either
   ///          event is undefined behaviour.
-  virtual auto getline() -> std::optional<std::string_view> = 0;
+  [[nodiscard]] virtual auto getline() -> std::optional<std::string_view> = 0;
 
   virtual ~FileSource() = default;
 

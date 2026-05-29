@@ -1,5 +1,6 @@
 #pragma once
 #include <boost/iostreams/device/mapped_file.hpp>
+#include <cstddef>
 #include <filesystem>
 #include <optional>
 #include <string_view>
@@ -12,11 +13,11 @@ namespace cc_cut {
 /// Memory-maps a file via Boost.Iostreams on load().
 /// getline() returns zero-copy string_view slices into the mapped region.
 /// Throws std::ios_base::failure if the file cannot be mapped.
-class MmapFileSource : public FileSource {
+class MmapFileSource final : public FileSource {
  public:
   explicit MmapFileSource(std::filesystem::path path);
   void load() override;
-  auto getline() -> std::optional<std::string_view> override;
+  [[nodiscard]] auto getline() -> std::optional<std::string_view> override;
 
  private:
   std::filesystem::path path_;
