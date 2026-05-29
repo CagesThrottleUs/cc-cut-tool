@@ -228,3 +228,73 @@ TEST(ProcessLineTest, EmptyLineProducesNewline) {
   ByteProcessor{opts}.process_line("", out);
   EXPECT_EQ(out.str(), "\n");
 }
+
+// ---------------------------------------------------------------------------
+// REQ-005: run — file loop
+// ---------------------------------------------------------------------------
+
+// spec_id: SPEC-6  validates_req: REQ-005  tc: TC-REQ005-01
+TEST(ByteProcessorRunTest, ValidFileReturns0) {
+  const auto tmp =
+      std::filesystem::temp_directory_path() / "bp_run_test_valid.txt";
+  {
+    std::ofstream ofs(tmp);
+    ofs << "hello\n";
+  }
+
+  std::ostringstream out;
+  std::ostringstream err;
+  const int ret = ByteProcessor{make_opts({0})}.run(out, {tmp.string()}, err);
+  std::filesystem::remove(tmp);
+
+  EXPECT_EQ(ret, 0);
+  EXPECT_EQ(out.str(), "h\n");
+  EXPECT_TRUE(err.str().empty());
+}
+
+// spec_id: SPEC-6  validates_req: REQ-005  tc: TC-REQ005-02
+TEST(ByteProcessorRunTest, NonExistentFileReturns1) {
+  std::ostringstream out;
+  std::ostringstream err;
+  const int ret =
+      ByteProcessor{make_opts({0})}.run(out, {"/no/such/file.txt"}, err);
+
+  EXPECT_EQ(ret, 1);
+  EXPECT_FALSE(err.str().empty());
+  EXPECT_NE(err.str().find("/no/such/file.txt"), std::string::npos);
+}
+
+// spec_id: SPEC-6  validates_req: REQ-005  tc: TC-REQ005-03
+TEST(ByteProcessorRunTest, FirstValidSecondMissingContinues) {
+  const auto tmp =
+      std::filesystem::temp_directory_path() / "bp_run_test_first.txt";
+  {
+    std::ofstream ofs(tmp);
+    ofs << "hello\n";
+  }
+
+  std::ostringstream out;
+  std::ostringstream err;
+  const int ret = ByteProcessor{make_opts({0})}.run(
+      out, {tmp.string(), "/no/such/file.txt"}, err);
+  std::filesystem::remove(tmp);
+
+  EXPECT_EQ(ret, 1);
+  EXPECT_EQ(out.str(), "h\n");
+  EXPECT_NE(err.str().find("/no/such/file.txt"), std::string::npos);
+}
+
+// spec_id: SPEC-6  validates_req: REQ-005  tc: TC-REQ005-04
+TEST(ByteProcessorRunTest, EmptyFileListReadsStdin) {
+  std::istringstream fake_stdin("hello\n");
+  auto* old_buf = std::cin.rdbuf(fake_stdin.rdbuf());
+
+  std::ostringstream out;
+  std::ostringstream err;
+  const int ret = ByteProcessor{make_opts({0})}.run(out, {}, err);
+
+  std::cin.rdbuf(old_buf);
+
+  EXPECT_EQ(ret, 0);
+  EXPECT_EQ(out.str(), "h\n");
+}
