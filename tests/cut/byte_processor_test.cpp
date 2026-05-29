@@ -58,3 +58,55 @@ TEST(ByteProcessorTest, ConstructsFromCutOptions) {
   CutOptions opts;
   EXPECT_NO_THROW(ByteProcessor{opts});
 }
+
+// ---------------------------------------------------------------------------
+// REQ-002: select_bytes — raw byte selection
+// ---------------------------------------------------------------------------
+
+namespace {
+
+// Helper: build a CutList with only indices (no open_from)
+auto make_list(std::initializer_list<int> idxs) -> cc_cut::CutList {
+  cc_cut::CutList list;
+  list.indices = std::set<int>{idxs};
+  return list;
+}
+
+// Helper: build a CutList with open_from only
+auto make_open_list(int from) -> cc_cut::CutList {
+  cc_cut::CutList list;
+  list.open_from = from;
+  return list;
+}
+
+}  // namespace
+
+// spec_id: SPEC-6  validates_req: REQ-002  tc: TC-REQ002-01
+TEST(SelectBytesTest, SingleByte) {
+  EXPECT_EQ(ByteProcessor::select_bytes("hello", make_list({0})), "h");
+}
+
+// spec_id: SPEC-6  validates_req: REQ-002  tc: TC-REQ002-02
+TEST(SelectBytesTest, NonContiguousBytes) {
+  EXPECT_EQ(ByteProcessor::select_bytes("hello", make_list({0, 1, 4})), "heo");
+}
+
+// spec_id: SPEC-6  validates_req: REQ-002  tc: TC-REQ002-03
+TEST(SelectBytesTest, OpenRange) {
+  EXPECT_EQ(ByteProcessor::select_bytes("hello", make_open_list(3)), "lo");
+}
+
+// spec_id: SPEC-6  validates_req: REQ-002  tc: TC-REQ002-04
+TEST(SelectBytesTest, OutOfBoundsPositionSkipped) {
+  EXPECT_EQ(ByteProcessor::select_bytes("hello", make_list({9})), "");
+}
+
+// spec_id: SPEC-6  validates_req: REQ-002  tc: TC-REQ002-05
+TEST(SelectBytesTest, EmptyLineReturnsEmpty) {
+  EXPECT_EQ(ByteProcessor::select_bytes("", make_list({0})), "");
+}
+
+// spec_id: SPEC-6  validates_req: REQ-002  tc: TC-REQ002-06
+TEST(SelectBytesTest, AllBytesSelected) {
+  EXPECT_EQ(ByteProcessor::select_bytes("abc", make_list({0, 1, 2})), "abc");
+}
