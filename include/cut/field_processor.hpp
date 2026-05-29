@@ -7,6 +7,7 @@
 
 #include "cut/list.hpp"
 #include "cut/options.hpp"
+#include "cut/processor.hpp"
 
 namespace cc_cut {
 
@@ -18,7 +19,7 @@ namespace cc_cut {
 ///
 /// @note opts.delim is expected to have a value for all CLI-reachable paths
 ///       in SP-05; whitespace-mode output (delim=nullopt) is out of scope.
-class FieldProcessor {
+class FieldProcessor : public Processor {
  public:
   explicit FieldProcessor(CutOptions opts);
 
@@ -52,7 +53,7 @@ class FieldProcessor {
   /// Continues past individual file errors; writes errors to err.
   /// Returns 0 on full success, 1 if any file error occurred.
   auto run(std::ostream& out, const std::vector<std::string>& files,
-           std::ostream& err) -> int;
+           std::ostream& err) -> int override;
 
  private:
   CutOptions opts_;
