@@ -79,7 +79,7 @@ check "cut -f1,2 sample.tsv" "$TMP/exp4" "$TMP/act4"
 
 {
     printf '\xef\xbb\xbfSong title,Artist\n'
-    printf '"10000 Reasons (Bless the Lord)",Matt Redman and Jonas Myrin\n'
+    printf '"10000 Reasons (Bless the Lord)",Matt Redman\xc2\xa0and\xc2\xa0Jonas Myrin\n'
     printf '"20 Good Reasons",Thirsty Merc\n'
     printf '"Adore You",Harry Styles\n'
     printf '"Africa",Toto\n'

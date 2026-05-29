@@ -88,19 +88,11 @@ printf '\xC3\xA9\n' | "$CUT" -b1 > "$TMP/act_bytes"
 # expected: c3 0a
 check_bytes "TC-REQ007-03b: -b1 without -n gives raw byte only" "c30a"
 
-# ---------- TC-REQ007-04: -c exits 1 with error message ----------
-# echo "hello" | cc-cut-tool -c1  → exit 1, stderr contains "character mode not yet implemented"
+# ---------- TC-REQ007-04: -c1 selects first codepoint (SP-07 shipped) ----------
+# echo "hello" | cc-cut-tool -c1  → "h", exit 0
 
-stderr04=$(echo "hello" | "$CUT" -c1 2>&1 >/dev/null || true)
-echo "hello" | "$CUT" -c1 >/dev/null 2>&1; exit04=$?
-if [ "$exit04" -eq 1 ] && echo "$stderr04" | grep -qF "character mode not yet implemented"; then
-    PASS=$((PASS + 1))
-    echo "PASS  TC-REQ007-04: -c1 exits 1 with expected error"
-else
-    FAIL=$((FAIL + 1))
-    echo "FAIL  TC-REQ007-04: -c1 exits 1 with expected error"
-    echo "  exit=$exit04  stderr=$stderr04"
-fi
+actual04=$(echo "hello" | "$CUT" -c1)
+check_val "TC-REQ007-04: -c1 selects first character" "h" "$actual04"
 
 # ---------- TC-REQ007-05: field mode regression ----------
 # echo "a,b,c" | cc-cut-tool -f2 -d,  → "b\n"

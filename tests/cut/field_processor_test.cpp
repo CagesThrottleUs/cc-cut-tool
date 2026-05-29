@@ -160,12 +160,12 @@ TEST(SelectFieldsTest, OpenFrom) {
 }
 
 // spec_id: SPEC-5  validates_req: REQ-004  tc: TC-REQ004-04
-TEST(SelectFieldsTest, MissingFieldBecomesEmpty) {
+TEST(SelectFieldsTest, MissingFieldOmitted) {
+  // Out-of-range field indices are skipped; POSIX cut does not emit empty fields
   const auto result =
       FieldProcessor::select_fields(make_fields({"a"}), make_list({0, 1}));
-  ASSERT_EQ(result.size(), 2U);
+  ASSERT_EQ(result.size(), 1U);
   EXPECT_EQ(result[0], "a");
-  EXPECT_EQ(result[1], "");
 }
 
 // spec_id: SPEC-5  validates_req: REQ-004  tc: TC-REQ004-05
@@ -235,10 +235,11 @@ TEST(ProcessLineTest, OpenEndRange) {
 }
 
 // spec_id: SPEC-5  validates_req: REQ-005  tc: TC-REQ005-06
-TEST(ProcessLineTest, MissingFieldEmptyInOutput) {
+TEST(ProcessLineTest, MissingFieldOmittedFromOutput) {
+  // Field index 3 doesn't exist in "a,b" — omitted from output per POSIX
   std::ostringstream out;
   FieldProcessor{make_opts_field(',', {0, 3})}.process_line("a,b", out);
-  EXPECT_EQ(out.str(), "a,\n");
+  EXPECT_EQ(out.str(), "a\n");
 }
 
 // ---------------------------------------------------------------------------
