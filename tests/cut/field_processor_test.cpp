@@ -131,10 +131,10 @@ auto make_fields(std::initializer_list<const char*> strs)
   return {strs.begin(), strs.end()};
 }
 
-auto make_list(std::initializer_list<int> idx,
-               std::optional<int> open = std::nullopt) -> CutList {
+auto make_list(std::initializer_list<std::size_t> idx,
+               std::optional<std::size_t> open = std::nullopt) -> CutList {
   CutList list;
-  list.indices = std::set<int>{idx.begin(), idx.end()};
+  list.indices = std::set<std::size_t>{idx.begin(), idx.end()};
   list.open_from = open;
   return list;
 }
@@ -193,14 +193,14 @@ TEST(SelectFieldsTest, IndicesAndOpenFromMerged) {
 
 namespace {
 
-auto make_opts_field(char delim, std::initializer_list<int> idx,
-                     std::optional<int> open = std::nullopt,
+auto make_opts_field(char delim, std::initializer_list<std::size_t> idx,
+                     std::optional<std::size_t> open = std::nullopt,
                      bool suppress = false) -> CutOptions {
   CutOptions opts;
   opts.mode = CutMode::FIELD;
   opts.delim = delim;
   opts.suppress = suppress;
-  opts.list.indices = std::set<int>{idx.begin(), idx.end()};
+  opts.list.indices = std::set<std::size_t>{idx.begin(), idx.end()};
   opts.list.open_from = open;
   return opts;
 }

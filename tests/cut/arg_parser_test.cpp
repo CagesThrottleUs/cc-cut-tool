@@ -4,6 +4,7 @@
 
 #include <gtest/gtest.h>
 
+#include <cstddef>
 #include <set>
 #include <string>
 #include <utility>
@@ -357,7 +358,7 @@ TEST(ParseArgsTest, FieldModeSeparate) {
   auto result = parse_args(holder.argc(), holder.argv());
   ASSERT_TRUE(result.has_value());
   EXPECT_EQ(result->opts.mode, CutMode::FIELD);
-  EXPECT_EQ(result->opts.list.indices, (std::set<int>{0}));
+  EXPECT_EQ(result->opts.list.indices, (std::set<std::size_t>{0}));
   EXPECT_TRUE(result->files.empty());
 }
 
