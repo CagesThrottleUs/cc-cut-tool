@@ -180,6 +180,18 @@ TEST(SelectBytesNoSplitTest, ContinuationByteInListDoesNotIncludeChar) {
       "a");
 }
 
+// spec_id: SPEC-6  validates_req: REQ-003  tc: TC-REQ003-09
+TEST(SelectBytesNoSplitTest, TruncatedSequenceIncludedAs1Byte) {
+  // "\xC3" alone is a truncated 2-byte sequence; treated as 1-byte char per ASM-002
+  EXPECT_EQ(ByteProcessor::select_bytes_no_split("\xC3", make_list({0})), "\xC3");
+}
+
+// spec_id: SPEC-6  validates_req: REQ-003  tc: TC-REQ003-10
+TEST(SelectBytesNoSplitTest, TruncatedSequenceExcluded) {
+  cc_cut::CutList empty;
+  EXPECT_EQ(ByteProcessor::select_bytes_no_split("\xC3", empty), "");
+}
+
 // ---------------------------------------------------------------------------
 // REQ-004: process_line
 // ---------------------------------------------------------------------------
@@ -267,6 +279,7 @@ TEST(ByteProcessorRunTest, NonExistentFileReturns1) {
   EXPECT_EQ(ret, 1);
   EXPECT_FALSE(err.str().empty());
   EXPECT_NE(err.str().find("/no/such/file.txt"), std::string::npos);
+  EXPECT_NE(err.str().find("cc-cut-tool:"), std::string::npos);
 }
 
 // spec_id: SPEC-6  validates_req: REQ-005  tc: TC-REQ005-03
