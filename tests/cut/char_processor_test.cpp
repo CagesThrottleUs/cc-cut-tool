@@ -172,3 +172,66 @@ TEST(ProcessLineTest, EmptyLineWritesJustNewline) {
   proc.process_line("", oss);
   EXPECT_EQ(oss.str(), "\n");
 }
+
+// ---------------------------------------------------------------------------
+// REQ-005: run() processes files, accumulates errors
+// ---------------------------------------------------------------------------
+
+// spec_id: SPEC-7  validates_req: REQ-005  tc: TC-REQ005-01
+TEST(RunTest, EmptyFilesReadsStdin) {
+  cc_cut::CutOptions opts;
+  opts.mode = cc_cut::CutMode::CHARACTER;
+  opts.list = make_list({0});
+  CharProcessor proc{opts};
+  std::istringstream fake_stdin{"ab\n"};
+  auto* const old_buf = std::cin.rdbuf(fake_stdin.rdbuf());
+  std::ostringstream out;
+  std::ostringstream err;
+  const int ret = proc.run(out, {}, err);
+  std::cin.rdbuf(old_buf);
+  EXPECT_EQ(ret, 0);
+  EXPECT_EQ(out.str(), "a\n");
+}
+
+// spec_id: SPEC-7  validates_req: REQ-005  tc: TC-REQ005-02
+TEST(RunTest, NonExistentFileReturns1) {
+  cc_cut::CutOptions opts;
+  opts.mode = cc_cut::CutMode::CHARACTER;
+  opts.list = make_list({0});
+  CharProcessor proc{opts};
+  std::ostringstream out;
+  std::ostringstream err;
+  const int ret = proc.run(out, {"/no/such/sp07_missing.txt"}, err);
+  EXPECT_EQ(ret, 1);
+  EXPECT_TRUE(err.str().starts_with("cc-cut-tool: "));
+}
+
+// spec_id: SPEC-7  validates_req: REQ-005  tc: TC-REQ005-03
+TEST(RunTest, ErrorMessageContainsPath) {
+  cc_cut::CutOptions opts;
+  opts.mode = cc_cut::CutMode::CHARACTER;
+  opts.list = make_list({0});
+  CharProcessor proc{opts};
+  std::ostringstream out;
+  std::ostringstream err;
+  proc.run(out, {"/no/such/sp07_path_check.txt"}, err);
+  EXPECT_NE(err.str().find("/no/such/sp07_path_check.txt"), std::string::npos);
+}
+
+// spec_id: SPEC-7  validates_req: REQ-005  tc: TC-REQ005-04
+TEST(RunTest, ContinuesAfterMissingFile) {
+  const auto tmp =
+      std::filesystem::temp_directory_path() / "sp07_continue_test.tmp";
+  { std::ofstream{tmp} << "ab\n"; }
+
+  cc_cut::CutOptions opts;
+  opts.mode = cc_cut::CutMode::CHARACTER;
+  opts.list = make_list({0});
+  CharProcessor proc{opts};
+  std::ostringstream out;
+  std::ostringstream err;
+  const int ret = proc.run(out, {"/no/such/sp07_missing.txt", tmp.string()}, err);
+  std::filesystem::remove(tmp);
+  EXPECT_EQ(ret, 1);
+  EXPECT_EQ(out.str(), "a\n");
+}
